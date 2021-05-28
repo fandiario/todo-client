@@ -1,0 +1,116 @@
+:root {
+    --primary: #fbc531;
+    --secondary: #5f27cd;
+    --dark: #1e272e;
+    --light: #ecf0f1;
+    --success: #6ab04c;
+    --danger: #EA2027;
+    --disabled: #01a3a4;
+}
+
+body {
+    overflow-x:hidden;
+}
+
+/* BG-Colour */
+.todo-bg-primary {
+    background-color: var(--primary);
+}
+
+.todo-bg-secondary {
+    background-color: var(--secondary);
+}
+
+.todo-bg-dark {
+    background-color: var(--dark);
+}
+
+.todo-bg-light {
+    background-color: var(--light);
+}
+
+.todo-bg-danger {
+    background-color: var(--danger);
+}
+
+.todo-bg-success {
+    background-color: var(--success);
+}
+
+/* Colour */
+.todo-colour-primary {
+    color: var(--primary);
+}
+
+.todo-colour-dark {
+    color: var(--dark);
+}
+
+.todo-colour-light {
+    color: var(--light)
+}
+
+/* Border */
+.todo-border-primary {
+    border: 3px solid var(--primary)
+}
+
+.todo-border-dark {
+    border: 3px solid var(--dark)
+}
+
+.todo-border-light {
+    border: 3px solid var(--light)
+}
+
+.todo-border-rad3 {
+    border-radius: 3px;
+}
+
+.todo-border-rad5 {
+    border-radius: 5px;
+}
+
+.todo-border-rad10 {
+    border-radius: 10px;
+}
+
+/* Button */
+.todo-btn-primary {
+    background-color: var(--primary);
+    color: var(--dark);
+}
+
+.todo-btn-secondary {
+    background-color: var(--secondary);
+    color: var(--light);
+}
+
+.todo-btn-dark {
+    background-color: var(--dark);
+    color: var(--light);
+}
+
+.todo-btn-light {
+    background-color: var(--light);
+    color: var(--dark);
+}
+
+.todo-btn-danger {
+    background-color: var(--danger);
+    color: var(--light);
+}
+
+.todo-btn-success {
+    background-color: var(--success);
+    color: var(--dark);
+}
+
+/* Font Style */
+.todo-fs-italic {
+    font-style: italic;
+}
+
+.todo-fs-bold {
+    font-weight: bold;
+}
