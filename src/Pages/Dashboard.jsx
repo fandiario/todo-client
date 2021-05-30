@@ -12,6 +12,7 @@ import EditUser from "../Components/EditUser"
 
 import CreateWorkspace from "../Components/AddWorkspace"
 import DetailWorkspace from "../Components/DetailWorkspace"
+import DetailAssignedWorkspace from "../Components/DetailAssignedWorkspace"
 
 import CreateCategory from "../Components/AddCategory"
 
@@ -107,11 +108,19 @@ class Dashboard extends React.Component {
 
         this.props.onGetWorkspaceByAssigned (token)
 
-        // let arrDetailAssignedWorkspaces = []
+        let arrDetailAssignedWorkspaces = []
 
-        // arrDetailAssignedWorkspaces.push (false)
+        if (this.props.workspace.assignedWorkspaces.data){
+            // console.log ("test")
+            // console.log (this.props.workspace.assignedWorkspaces)
 
-        // this.setState ({modalDetailAssignedWorkspaces: arrDetailAssignedWorkspaces})
+            for (let i = 0; i < (this.props.workspace.assignedWorkspaces.data).length; i++){
+                arrDetailAssignedWorkspaces.push (false)
+            }
+        }
+
+        this.setState ({modalDetailAssignedWorkspaces: arrDetailAssignedWorkspaces})
+        // console.log (this.state.modalDetailAssignedWorkspaces)
     }
 
     getCategoryFromWorkspace = (idWorkspace) => {
@@ -217,7 +226,7 @@ class Dashboard extends React.Component {
 
             this.setState ({modalDetailWorkspaces: arrModalDetailWorkspaces})
 
-            // console.log (this.state.modalDetailWorkspaces)
+            console.log (this.state.modalDetailWorkspaces)
         }
 
     }
@@ -229,6 +238,32 @@ class Dashboard extends React.Component {
         arrModalDetailWorkspaces[data.index] = data.state  
         
         this.setState ({modalDetailWorkspaces: arrModalDetailWorkspaces})
+    }
+
+    onShowDetailAssignedWorkspace = (index) => {
+        // console.log (index)
+
+        if (this.state.modalDetailAssignedWorkspaces) {
+
+            let arrModalDetailAssignedWorkspaces = this.state.modalDetailAssignedWorkspaces
+
+            // arrModalDetailAssignedWorkspaces[index] = !(this.state.modalDetailAssignedWorkspaces[index])
+            arrModalDetailAssignedWorkspaces[index] = true
+
+            this.setState ({modalDetailAssignedWorkspaces: arrModalDetailAssignedWorkspaces})
+
+            // console.log (this.state.modalDetailAssignedWorkspaces)
+        }
+
+        // console.log (this.state.modalDetailWorkspaces)
+    }
+
+    onToggleDetailAssignedWorkspace = (data) => {
+        let arrModalDetailAssignedWorkspaces = this.state.modalDetailAssignedWorkspaces
+
+        arrModalDetailAssignedWorkspaces[data.index] = data.state
+
+        this.setState ({modalDetailAssignedWorkspaces: arrModalDetailAssignedWorkspaces})
     }
 
     onLogOutUser = () => {
@@ -406,7 +441,11 @@ class Dashboard extends React.Component {
                                                                     <input type="button" value="Remove This Workspace" className="btn"/>
                                                                 </DropdownItem> */}
                                                                 <DropdownItem className="">
-                                                                    <input type="button" value="Detail" className="btn"/>
+                                                                    <input type="button" value="Detail" className="btn" onClick={() => this.onShowDetailAssignedWorkspace(i)}/>
+
+                                                                    {/* Modal Detail Assigned Workspace */}
+                                                                    <DetailAssignedWorkspace idWorkspace={el.workspaces_id} indexWorkspace={i} stateModal={this.state.modalDetailAssignedWorkspaces[i]} toggleModalDetail = {this.onToggleDetailAssignedWorkspace}></DetailAssignedWorkspace>
+                                                                
                                                                 </DropdownItem>
                                                             </DropdownMenu>
                                                         </Dropdown>

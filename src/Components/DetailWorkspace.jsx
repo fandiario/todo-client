@@ -70,11 +70,11 @@ class DetailWorkspace extends React.Component {
             arrAlerts.push ("You have to fill an email address")
             this.setState ({alerts: arrAlerts})
         
-        } else if (validator.isEmail (email === false)) {
+        } else if (validator.isEmail (email) === false) {
             arrAlerts.push ("Unknown email address format.")
             this.setState ({alerts: arrAlerts})
 
-        } else {
+        } else if (validator.isEmail (email) === true) {
             this.props.addMemberWorkspace (idWorkspace, token, email)
             this.setState ({showButton: false})
             this.setState ({alerts: []})
