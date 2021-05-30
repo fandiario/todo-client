@@ -28,15 +28,15 @@ import swal from "sweetalert"
 class Dashboard extends React.Component {
 
     state = {
-        dataUser: null,
+        // dataUser: null,
         dataWorkspace: null,
         activeWorkspace: null,
         taskWorkspaces: [],
-        dropDownWorkspaces: null,
-        dropDownCategories: null,
-        dropDownTasks: null,
-        modalDetailWorkspaces: null,
-        modalDetailAssignedWorkspaces: null
+        dropDownWorkspaces: [],
+        dropDownCategories: [],
+        dropDownTasks: [],
+        modalDetailWorkspaces: [],
+        modalDetailAssignedWorkspaces: []
     }
 
     componentDidMount () {
@@ -204,9 +204,9 @@ class Dashboard extends React.Component {
         }
     }
 
-    onShowDetailWorkspace = (idWorkspace, index) => {
+    onShowDetailWorkspace = (index) => {
 
-        console.log (idWorkspace)
+        // console.log (idWorkspace)
 
         if (this.state.modalDetailWorkspaces) {
 
@@ -217,19 +217,18 @@ class Dashboard extends React.Component {
 
             this.setState ({modalDetailWorkspaces: arrModalDetailWorkspaces})
 
-            console.log (this.state.modalDetailWorkspaces)
+            // console.log (this.state.modalDetailWorkspaces)
         }
 
     }
 
     onToggleDetailWorkspace = (data) => {
-        // let arrModalDetailWorkspaces = this.state.modalDetailWorkspaces
-
-        // arrModalDetailWorkspaces[index] = 
-
-        console.log (`From detail workspace: ${data}`)
-
-        // 
+        // console.log (`From detail workspace: ${data.index}`)
+        let arrModalDetailWorkspaces = this.state.modalDetailWorkspaces
+        
+        arrModalDetailWorkspaces[data.index] = data.state  
+        
+        this.setState ({modalDetailWorkspaces: arrModalDetailWorkspaces})
     }
 
     onLogOutUser = () => {
@@ -267,19 +266,19 @@ class Dashboard extends React.Component {
         //     console.log (this.state.dataWorkspace)
         // }
 
-        if (!(this.state.dataUser)) {
-            return (
-                <div className="container">
-                    <Logo></Logo>
+        // if (!(this.state.dataUser)) {
+        //     return (
+        //         <div className="container">
+        //             <Logo></Logo>
 
-                    <div className="row my-5">
-                        <h1>
-                            Now Loading
-                        </h1>
-                    </div>
-                </div>
-            )
-        }
+        //             <div className="row my-5">
+        //                 <h1>
+        //                     Now Loading
+        //                 </h1>
+        //             </div>
+        //         </div>
+        //     )
+        // }
 
         return (
             <div className="container">
@@ -300,7 +299,8 @@ class Dashboard extends React.Component {
                             {/* User'email */}
                             <div className="mb-3 row">
                                 <div className="col-9 d-flex align-self-center">
-                                    {this.state.dataUser.email}
+                                    {/* {this.state.dataUser.email} */}
+                                    {this.props.user.dataUser.email}
                                 </div>
                                 <div className="col-1 p-0">
                                     {/* <button className="btn todo-btn-primary todo-border-dark todo-border-rad5">
@@ -348,10 +348,10 @@ class Dashboard extends React.Component {
                                                                     <input type="button" value="Remove This Workspace" className="btn"/>
                                                                 </DropdownItem>
                                                                 <DropdownItem className="">
-                                                                    <input type="button" value="Detail" className="btn" onClick={() => this.onShowDetailWorkspace(el.workspaces_id, i)}/>
+                                                                    <input type="button" value="Detail" className="btn" onClick={() => this.onShowDetailWorkspace(i)}/>
                                                                     
                                                                     {/* Modal Detail Workspace */}
-                                                                    <DetailWorkspace idWorkspace={el.workspaces_id} stateModal={this.state.modalDetailWorkspaces[i]} toggleModalDetail = {this.onToggleDetailWorkspace()}></DetailWorkspace>
+                                                                    <DetailWorkspace idWorkspace={el.workspaces_id} stateModal={this.state.modalDetailWorkspaces[i]} indexWorkspace={i} toggleModalDetail = {this.onToggleDetailWorkspace}></DetailWorkspace>
 
                                                                 </DropdownItem>
                                                             </DropdownMenu>

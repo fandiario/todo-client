@@ -58,26 +58,27 @@ class EditUser extends React.Component {
             if (validEmail === true && validPassword === true) {
                 // console.log ("success edit")
                 this.props.onEditUser (emailInput, passwordInput, token)
+
+                // this.onGetDataUser ()
             }
 
-            this.onGetDataUser ()
+            // this.onGetDataUser ()
+            // console.log (this.props.user.dataUser)
 
             this.setState ({showModal: false})
+
+            window.location = "/dashboard"
         }
 
-        // console.log (emailInput)
-        // console.log (passwordInput)
-        // console.log (passwordConfirm)
-
     }
 
-    onGetDataUser = () => {
-        let token = localStorage.getItem ("token")
+    // onGetDataUser = () => {
+    //     let token = localStorage.getItem ("token")
 
-        this.props.getDataUser (token)
+    //     this.props.getDataUser (token)
 
-        console.log (this.props.user.dataUser)
-    }
+    //     // console.log (this.props.user.dataUser)
+    // }
 
     render () {
         return (

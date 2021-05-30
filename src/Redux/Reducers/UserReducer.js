@@ -2,7 +2,7 @@ let initialState = {
     token: null,
     error: null,
     emailUser: null,
-    dataUser: null,
+    dataUser: [],
     isRedirect: false,
     isRedirectLogin: false,
     message: null
@@ -11,7 +11,7 @@ let initialState = {
 const userReducer = (state = initialState, action) => {
     switch (action.type) {
         case "AUTH_SUCCESS" : 
-            return {...state, dataUser: action.payload, isRedirect: true, error: false}
+            return {...state, dataUser: action.payload, isRedirect: true, error: false, message: null}
         
         case "AUTH_ERROR" : 
             return {...state, message: action.payload, error: true}

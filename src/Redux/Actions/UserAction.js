@@ -183,14 +183,38 @@ export const onEditUser = (email, password, token) => {
 
         .then ((res) => {
             if (res.data.error === false) {
-                dispatch (
-                    {
-                        type: "EDIT_USER_SUCCESS",
-                        payload: res.data.message
-                    }
-                )
+                // dispatch (
+                //     {
+                //         type: "EDIT_USER_SUCCESS",
+                //         payload: res.data.message
+                //     }
+                // )
 
                 // Select data secara manual baru kemudian disimpan lagi
+
+                // console.log (res.data.error)
+
+                Axios.post (`${linkAPIUser}/get-data-user`, {token})
+
+                .then ((res) => {
+                    if (res.data.error === false) {
+                        dispatch (
+                            {
+                                type: "AUTH_SUCCESS",
+                                payload: res.data
+                            }   
+                        )
+
+                    } else if (res.data.error === true) {
+                        // console.log (res.data.message)
+                        dispatch (
+                            {
+                                type: "AUTH_ERROR",
+                                payload: res.data.message
+                            }
+                        )
+                    }
+                })
 
             } else {
                 dispatch (
