@@ -45,6 +45,12 @@ const workspaceReducer = (state = initialState, action) => {
         case "DEL_MEMBER_ERROR" :
             return {...state, message: action.payload, error: true}
 
+        case "EDIT_WORKSPACE_SUCCESS" :
+            return {...state, message: action.payload, error: false}
+
+        case "EDIT_WORKSPACE_ERROR" :
+            return {...state, message: action.payload, error: true}
+
         default:
             return state
     }

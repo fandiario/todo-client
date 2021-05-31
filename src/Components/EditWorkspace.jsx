@@ -1,22 +1,21 @@
 import React from "react"
-// import validator from "validator"
+import validator from "validator"
 
 // Redux
 import {connect} from "react-redux"
-import {getDataWorkspace, getMembersWorkspace, addMemberWorkspace, deleteMemberWorkspace} from "../Redux/Actions/WorkspaceAction"
+import {getDataWorkspace, getMembersWorkspace, addMemberWorkspace, deleteMemberWorkspace, editWorkspace} from "../Redux/Actions/WorkspaceAction"
 
 // Reactstrap
-import {Modal, ModalHeader, ModalBody} from "reactstrap"
-// import {ModalFooter} from "reactstrap"
+import {Modal, ModalHeader, ModalBody, ModalFooter} from "reactstrap"
 
 // FontAwesome
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 // Sweetalert
-// import swal from "sweetalert"
+import swal from "sweetalert"
 
-class DetailWorkspace extends React.Component {
+class EditWorkspace extends React.Component {
 
     state = {
         showModal: false,
@@ -26,22 +25,17 @@ class DetailWorkspace extends React.Component {
 
     componentDidMount () {
         this.onShowModal ()
-        this.onGetDataWorkspace ()
     }
 
     onShowModal = () => {
-        // let idWorkspace = this.props.idWorkspace
         let stateModal = this.props.stateModal
 
         this.setState({showModal: stateModal})
-
-        // console.log ("hello from detail workspace")
-        // console.log (idWorkspace)
-        // console.log (stateModal)
     }
 
     onToggleModal = () => {
         this.setState ({showModal: false})
+        this.setState ({showButton: false})
 
         let dataToSend = {
             state: false,
@@ -49,7 +43,7 @@ class DetailWorkspace extends React.Component {
             index: this.props.indexWorkspace
         }
 
-        this.props.toggleModalDetail (dataToSend)
+        this.props.toggleModalEdit (dataToSend)
     }
 
     onGetDataWorkspace = () => {
@@ -60,76 +54,108 @@ class DetailWorkspace extends React.Component {
         this.props.getMembersWorkspace(idWorkspace, token)
     }
 
-    // onSubmitNewMember = () => {
-    //     let idWorkspace = this.props.idWorkspace
-    //     let token = localStorage.getItem ("token")
-    //     let email = this.emailInput.value
+    onSubmitNewMember = () => {
+        let idWorkspace = this.props.idWorkspace
+        let token = localStorage.getItem ("token")
+        let email = this.emailInput.value
 
-    //     let arrAlerts = []
+        let arrAlerts = []
 
-    //     if (!(email)) {
-    //         arrAlerts.push ("You have to fill an email address")
-    //         this.setState ({alerts: arrAlerts})
+        if (!(email)) {
+            arrAlerts.push ("You have to fill an email address")
+            this.setState ({alerts: arrAlerts})
         
-    //     } else if (validator.isEmail (email) === false) {
-    //         arrAlerts.push ("Unknown email address format.")
-    //         this.setState ({alerts: arrAlerts})
+        } else if (validator.isEmail (email) === false) {
+            arrAlerts.push ("Unknown email address format.")
+            this.setState ({alerts: arrAlerts})
 
-    //     } else if (email === this.props.user.dataUser.email) {
-    //         arrAlerts.push ("This user has been registered as the creator of this workspace.")
-    //         this.setState ({alerts: arrAlerts})
+        } else if (email === this.props.user.dataUser.email) {
+            arrAlerts.push ("This user has been registered as the creator of this workspace.")
+            this.setState ({alerts: arrAlerts})
 
-    //     } else {
-    //         this.props.addMemberWorkspace (idWorkspace, token, email)
-    //         this.setState ({showButton: false})
-    //         this.setState ({alerts: []})
-    //         // this.setState ({showModal: false})
-    //     }
+        } else {
+            this.props.addMemberWorkspace (idWorkspace, token, email)
+            this.setState ({showButton: false})
+            this.setState ({alerts: []})
+            // this.setState ({showModal: false})
+        }
 
-    //     // console.log (idWorkspace)
-    //     // console.log (token)
-    //     // console.log (email)
-    // }
+        // console.log (idWorkspace)
+        // console.log (token)
+        // console.log (email)
+    }
 
-    // onDeleteMember = (idMembers) => {
-    //     let members_users_id = idMembers
-    //     let token = localStorage.getItem ("token")
-    //     let idWorkspace = this.props.idWorkspace
+    onDeleteMember = (idMembers) => {
+        let members_users_id = idMembers
+        let token = localStorage.getItem ("token")
+        let idWorkspace = this.props.idWorkspace
 
+        swal ({
+            title: "Delete ?",
+            text: "Are you sure you want to delete this user from your workspace's membership ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        })
 
-    //     swal ({
-    //         title: "Delete ?",
-    //         text: "Are you sure you want to delete this user from your workspace's membership ?",
-    //         icon: "warning",
-    //         buttons: true,
-    //         dangerMode: true
-    //     })
+        .then ((res) => {
+            if (res) {
+                this.props.deleteMemberWorkspace(idWorkspace,token,members_users_id,)
 
-    //     .then ((res) => {
-    //         if (res) {
-    //             this.props.deleteMemberWorkspace(idWorkspace,token,members_users_id,)
+                this.setState ({showButton: false})
+            } 
+        })
 
-    //             this.setState ({showButton: false})
-    //         } 
-    //     })
+        .catch ((err) => {
+            console.log (err)
+        })
 
-    //     .catch ((err) => {
-    //         console.log (err)
-    //     })
+    }
 
-    // }
+    onSubmitEditWorkspace = () => {
+        let idWorkspace = this.props.idWorkspace
+        let title = this.titleInput.value
+        let token = localStorage.getItem ("token")
+
+        let arrAlerts = []
+
+        if (!(title)) {
+            arrAlerts.push ("You have to fill workspace's title.")
+            this.setState ({alerts: arrAlerts})
+
+        } else {
+            swal ({
+                title: "Edit Data?",
+                text: "Are you sure you want to edit this workspace ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            })
+    
+            .then ((res) => {
+                if (res) {
+                    this.props.editWorkspace(idWorkspace,title, token)
+    
+                    window.location ="/dashboard"
+                } 
+            })
+    
+            .catch ((err) => {
+                console.log (err)
+            })
+        }
+
+    }
 
 
     render () {
         return (
             <div className="container">
-
-                {/* <input type="button" value="Detail" className="btn" /> */}
-
                 <Modal isOpen= {this.state.showModal} toggle={() => this.onToggleModal()} className="todo-border-dark todo-border-rad5">
                     <ModalHeader>
-                        Detail Workspace
+                        Edit Workspace
                     </ModalHeader>
+
                     <ModalBody>
                         {/* Alert */}
                         {
@@ -176,43 +202,14 @@ class DetailWorkspace extends React.Component {
                                 null
                         }
 
-                        {/* Detail */}
+                        {/* Form */}
                         <div className="mb-3">
-                            <span className="todo-fs-bold">
-                                ID:
-                            </span>
-                            <span className="ml-2">
-                                {this.props.idWorkspace}
-                            </span>
+                            <label className="form-label todo-fs-bold">
+                                Title
+                            </label>
+                            <input type="text" className="form-control todo-border-dark" ref={(e) => this.titleInput = (e)} defaultValue={this.props.workspace.data.title}/>
                         </div>
                         
-                        <div className="mb-3">
-                            <span className="todo-fs-bold">
-                                Title:
-                            </span>
-                            <span className="ml-2">
-                                {this.props.workspace.data.title}
-                            </span>
-                        </div>
-
-                        <div className="mb-3">
-                            <span className="todo-fs-bold">
-                                Created by : 
-                            </span>
-                            <span className="ml-2">
-                                {this.props.workspace.data.email}
-                            </span>
-                        </div>
-
-                        <div className="mb-3">
-                            <span className="todo-fs-bold">
-                                Created at : 
-                            </span>
-                            <span className="ml-2">
-                                {(new Date (this.props.workspace.data.created_at)).toLocaleString()}
-                            </span>
-                        </div>
-
                         <div className="mb-3">
                             <div className="todo-fs-bold">
                                 Member(s) :
@@ -226,11 +223,11 @@ class DetailWorkspace extends React.Component {
                                                     <span>
                                                         {el.email}
                                                     </span>
-                                                    {/* <span>
+                                                    <span>
                                                         <button className="btn btn-light ml-3 mb-3 todo-border-dark todo-border-rad5" onClick={() => this.onDeleteMember (el.id)}>
                                                             <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
                                                         </button>
-                                                    </span> */}
+                                                    </span>
                                                 </div>
                                             )
                                         })
@@ -241,7 +238,7 @@ class DetailWorkspace extends React.Component {
                                         </div>
                                 }
                             </div>
-                            {/* {
+                            {
                                 this.state.showButton === false ?
                                     <div>
                                         <button className="btn btn-light todo-border-dark todo-border-rad5" onClick={() => this.setState ({showButton: true})}>
@@ -254,28 +251,24 @@ class DetailWorkspace extends React.Component {
                                         </button>
                                     </div>
                                 :
-                                    <div>
-                                        <label className="form-label todo-fs-bold">Email</label>
+                                <div>
+                                    <label className="form-label todo-fs-bold">Email</label>
+                                    <div className="d-flex justify-content-between">
                                         <input type="text" className="form-control todo-border-dark" placeholder="Insert user's email to add as a member" ref={(e) => this.emailInput = (e)}/>
+                                        <button className="btn todo-btn-primary py-1 todo-fs-bold todo-border-dark todo-border-rad5 ml-1" onClick={() => this.onSubmitNewMember()}>Add</button>
                                     </div>
-                            } */}
-                            
+                                </div>
+                            }
+                    
                         </div>
-
-                        {/* (Insert Detail of Workspace with id {this.props.idWorkspace}) */}
                     </ModalBody>
 
-                    {/* {
-                        this.state.showButton === true ?
-                            <ModalFooter>
-                                <div className="mb-3">
-                                    <input type="button" value="Submit" className="btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onSubmitNewMember ()}/>
-                                    <input type="button" value="Cancel" className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold ml-3" onClick={() => this.setState ({showButton: false})}/>
-                                </div>
-                            </ModalFooter>
-                        :
-                            null
-                    } */}
+                    <ModalFooter>
+                        <div className="mb-3">
+                            <input type="button" value="Submit" className="btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onSubmitEditWorkspace()}/>
+                            <input type="button" value="Cancel" className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold ml-3" onClick={() => this.onToggleModal()}/>
+                        </div>
+                    </ModalFooter>
                 </Modal>
             </div>
         )
@@ -293,9 +286,10 @@ const mapDispatchToProps = {
     getDataWorkspace,
     getMembersWorkspace,
     addMemberWorkspace,
-    deleteMemberWorkspace
+    deleteMemberWorkspace,
+    editWorkspace
 }
 
-export default connect (mapStateToProps, mapDispatchToProps) (DetailWorkspace)
+export default connect (mapStateToProps, mapDispatchToProps) (EditWorkspace)
 
-// export default DetailWorkspace
+// export default EditWorkspace

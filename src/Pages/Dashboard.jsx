@@ -13,6 +13,7 @@ import EditUser from "../Components/EditUser"
 import CreateWorkspace from "../Components/AddWorkspace"
 import DetailWorkspace from "../Components/DetailWorkspace"
 import DetailAssignedWorkspace from "../Components/DetailAssignedWorkspace"
+import EditWorkspace from "../Components/EditWorkspace"
 
 import CreateCategory from "../Components/AddCategory"
 
@@ -36,6 +37,7 @@ class Dashboard extends React.Component {
         dropDownWorkspaces: [],
         dropDownCategories: [],
         dropDownTasks: [],
+        modalEditWorkspaces: [],
         modalDetailWorkspaces: [],
         modalDetailAssignedWorkspaces: []
     }
@@ -50,6 +52,7 @@ class Dashboard extends React.Component {
     //     this.getDataUser ()
     // }
 
+    // User
     getDataUser = () => {
         let token = localStorage.getItem ("token")
 
@@ -64,6 +67,29 @@ class Dashboard extends React.Component {
         this.setState ({dataUser: data})
     }
 
+    onLogOutUser = () => {
+        swal ({
+            title: "Log Out ?",
+            text: "Are you sure you want to log out ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        })
+
+        .then ((res) => {
+            if (res) {
+                localStorage.removeItem ("token")
+                window.location = "/"
+            } 
+        })
+
+        .catch ((err) => {
+            console.log (err)
+        })
+    }
+
+
+    // Workspace
     getWorkspaceByUser = () => {
         let token = localStorage.getItem ("token")
 
@@ -71,6 +97,7 @@ class Dashboard extends React.Component {
 
         // console.log (this.props.workspace.workspaces)
         let arrDropDowns = []
+        let arrEditWorkspaces = []
         let arrDetailWorkspaces = []
 
         if (this.props.workspace.workspaces.data) {
@@ -80,6 +107,7 @@ class Dashboard extends React.Component {
             // console.log (this.props.workspace.workspaces.data)
 
             for (let i = 0; i < (this.props.workspace.workspaces.data).length; i++){
+                arrEditWorkspaces.push (false)
                 arrDetailWorkspaces.push (false)
             }
             
@@ -98,9 +126,11 @@ class Dashboard extends React.Component {
         
         this.setState ({dropDownWorkspaces: arrDropDowns})
 
+        this.setState ({modalEditWorkspaces: arrEditWorkspaces})
+
         this.setState ({modalDetailWorkspaces: arrDetailWorkspaces})
 
-        // console.log (this.props.workspace.workspaces)
+
     }
 
     getAssignedWorkspace = () => {
@@ -123,6 +153,7 @@ class Dashboard extends React.Component {
         // console.log (this.state.modalDetailAssignedWorkspaces)
     }
 
+    // Category
     getCategoryFromWorkspace = (idWorkspace) => {
         let token = localStorage.getItem ("token")
 
@@ -156,6 +187,7 @@ class Dashboard extends React.Component {
         // console.log (this.state.activeWorkspace)
     }
 
+    // Task
     getTaskWorkspace = (idWorkspace) => {
         let token = localStorage.getItem ("token")
 
@@ -183,6 +215,7 @@ class Dashboard extends React.Component {
         // console.log (this.props.task.taskWorkspaces)
     }
 
+    // DropDowns 
     toggleDropdownWorkspace = (i) => {
         if (this.state.dropDownWorkspaces) {
             let arrDropDownWorkspaces = this.state.dropDownWorkspaces
@@ -213,6 +246,30 @@ class Dashboard extends React.Component {
         }
     }
 
+
+    // Modal
+    // Workspace
+
+    onShowEditWorkspace = (index) => {
+        if (this.state.modalEditWorkspaces) {
+            let arrEditWorkspaces = this.state.modalEditWorkspaces
+
+            arrEditWorkspaces[index] = true
+
+            this.setState ({modalEditWorkspaces: arrEditWorkspaces})
+        }
+    }
+
+    onToggleEditWorkspace = (data) => {
+        // console.log (`From edit workspace: ${data.index}`)
+
+        let arrEditWorkspaces = this.state.modalEditWorkspaces
+
+        arrEditWorkspaces[data.index] = data.state
+
+        this.setState ({modalEditWorkspaces: arrEditWorkspaces})
+    }
+
     onShowDetailWorkspace = (index) => {
 
         // console.log (idWorkspace)
@@ -226,7 +283,7 @@ class Dashboard extends React.Component {
 
             this.setState ({modalDetailWorkspaces: arrModalDetailWorkspaces})
 
-            console.log (this.state.modalDetailWorkspaces)
+            // console.log (this.state.modalDetailWorkspaces)
         }
 
     }
@@ -266,26 +323,9 @@ class Dashboard extends React.Component {
         this.setState ({modalDetailAssignedWorkspaces: arrModalDetailAssignedWorkspaces})
     }
 
-    onLogOutUser = () => {
-        swal ({
-            title: "Log Out ?",
-            text: "Are you sure you want to log out ?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true
-        })
 
-        .then ((res) => {
-            if (res) {
-                localStorage.removeItem ("token")
-                window.location = "/"
-            } 
-        })
 
-        .catch ((err) => {
-            console.log (err)
-        })
-    }
+    
 
     render () {
 
@@ -377,7 +417,11 @@ class Dashboard extends React.Component {
                                                             </DropdownToggle>
                                                             <DropdownMenu className=" todo-border-dark todo-border-rad5">
                                                                 <DropdownItem className="">
-                                                                    <input type="button" value="Edit This Workspace" className="btn"/>
+                                                                    <input type="button" value="Edit This Workspace" className="btn" onClick={() => this.onShowEditWorkspace(i)}/>
+
+                                                                    {/* Modal Edit Workspace */}
+                                                                    <EditWorkspace idWorkspace={el.workspaces_id} indexWorkspace={i} stateModal={this.state.modalEditWorkspaces[i]} toggleModalEdit = {this.onToggleEditWorkspace}></EditWorkspace>
+
                                                                 </DropdownItem>
                                                                 <DropdownItem className="">
                                                                     <input type="button" value="Remove This Workspace" className="btn"/>

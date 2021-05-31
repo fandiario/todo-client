@@ -3,6 +3,9 @@ import React from "react"
 // Reactstrap
 import {Modal, ModalHeader, ModalBody, ModalFooter} from "reactstrap"
 
+// Redux
+import {connect} from "react-redux"
+
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus  } from '@fortawesome/free-solid-svg-icons'
@@ -47,11 +50,15 @@ class CreateWorkspace extends React.Component {
                                 <label className="form-label todo-fs-bold">
                                     Members
                                 </label> 
-                                <select className="form-control todo-border-dark">
+                                {/* {
+                                    this.props.workspace.members
+
+                                } */}
+                                {/* <select className="form-control todo-border-dark">
                                     <option value="">--Choose user--</option>
                                     <option value="1">(insert member's name here)</option>
                                     <option value="2">(insert another member's name here)</option>
-                                </select>
+                                </select> */}
                             </div>
                         </form>
                     </ModalBody>
@@ -69,4 +76,16 @@ class CreateWorkspace extends React.Component {
     }
 }
 
-export default CreateWorkspace
+const mapStateToProps = (state) => {
+    return {
+        workspace: state.workspace
+    }
+}
+
+const mapDispatchToProps = {
+    
+}
+
+export default connect (mapStateToProps, mapDispatchToProps) (CreateWorkspace)
+
+// export default CreateWorkspace

@@ -124,10 +124,28 @@ export const addMemberWorkspace = (idWorkspace, token, email) => {
 
         .then ((res) => {
             if (res.data.error === false) {
-                dispatch ({
-                    type: "ADD_MEMBER_SUCCESS",
-                    payload: res.data.message
-                }) 
+                // dispatch ({
+                //     type: "ADD_MEMBER_SUCCESS",
+                //     payload: res.data.message
+                // }) 
+
+                Axios.post (`${linkAPIWorkspace}/get-members-from-workspace`, {workspaces_id: idWorkspace, token: token})
+
+                .then ((res) => {
+                    // console.log (res.data.data)
+                    dispatch ({
+                        type: "GET_WORKSPACE_MEMBERS_SUCCESS",
+                        payload: res.data.data
+                    })
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_WORKSPACE_MEMBERS_ERROR",
+                        payload: err.message
+                    })
+                })
 
             } else {
                 dispatch ({
@@ -184,6 +202,58 @@ export const deleteMemberWorkspace = (idWorkspace, token, members_users_id) => {
             console.log (err)
             dispatch ({
                 type: "DEL_MEMBER_ERROR",
+                payload: err.message
+            })
+        })
+    }
+}
+
+export const editWorkspace = (idWorkspace, title, token) => {
+    return (dispatch) => {
+        Axios.patch (`${linkAPIWorkspace}/${idWorkspace}/edit-workspace`, {title, token})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+                Axios.post (`${linkAPIWorkspace}/get-workspace-by-owner`, {token})
+
+                .then ((res) => {
+                    // console.log (res.data)
+
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_SUCCESS",
+                            payload: res.data
+                        })
+                    
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_ERROR",
+                            payload: res.data.message
+                        }) 
+                    }
+                    
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_WORKSPACE_USER_ERROR",
+                        payload: err.message
+                    })
+                })
+
+            } else {
+                dispatch ({
+                    type: "EDIT_WORKSPACE_ERROR",
+                    payload: res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "EDIT_WORKSPACE_ERROR",
                 payload: err.message
             })
         })
