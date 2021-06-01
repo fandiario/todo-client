@@ -4,7 +4,7 @@ import React from "react"
 import {connect} from "react-redux"
 import {getDataUser} from "../Redux/Actions/UserAction"
 import {onGetWorkspaceUser, onGetWorkspaceByAssigned, removeWorkspace} from "../Redux/Actions/WorkspaceAction"
-import {onGetCategoryByWorkspace, onGetTaskByWorkspace} from "../Redux/Actions/TaskAction"
+import {onGetCategoryByWorkspace, onGetTaskByWorkspace, deleteCategory} from "../Redux/Actions/TaskAction"
 
 // Component
 import Logo from "../Components/Logo"
@@ -178,7 +178,7 @@ class Dashboard extends React.Component {
                     title: "Cancelled!",
                     text: "Workspace deletion has been cancelled",
                     icon: "info",
-                  })
+                })
             }
         })
 
@@ -294,7 +294,7 @@ class Dashboard extends React.Component {
 
 
     // Modal
-    // Workspace
+        // Workspace
 
     onShowEditWorkspace = (index) => {
         if (this.state.modalEditWorkspaces) {
@@ -369,9 +369,41 @@ class Dashboard extends React.Component {
         this.setState ({modalDetailAssignedWorkspaces: arrModalDetailAssignedWorkspaces})
     }
 
+        // Category
+    onRemoveCategory = (idCategory, idWorkspace) => {
+        // console.log (idCategory)
+        // console.log (idWorkspace)
 
+        let token = localStorage.getItem ("token")
 
-    
+        swal ({
+            title: "Delete ?",
+            text: "Are you sure you want to delete this category?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        })
+
+        .then ((res) => {
+            if (res) {
+                this.props.deleteCategory(idCategory, idWorkspace, token)
+            
+            } else {
+                swal({
+                    title: "Cancelled!",
+                    text: "Data deletion has been cancelled",
+                    icon: "info",
+                })
+            }
+            
+            
+        })
+
+        .catch ((err) => {
+            console.log (err)
+        })
+
+    }
 
     render () {
 
@@ -1227,7 +1259,7 @@ class Dashboard extends React.Component {
                                                                                                     </DropdownItem>
 
                                                                                                     <DropdownItem>
-                                                                                                        <input type="button" value="Remove Category ?" className="btn"/>
+                                                                                                        <input type="button" value="Remove Category ?" className="btn" onClick={() => this.onRemoveCategory(el.id, el.category_at_workspaces_id)}/>
                                                                                                     </DropdownItem>
                                                                                                 </DropdownMenu>
                                                                                             </Dropdown>
@@ -1373,7 +1405,8 @@ const mapDispatchToProps = {
     onGetWorkspaceByAssigned,
     removeWorkspace,
     onGetCategoryByWorkspace,
-    onGetTaskByWorkspace
+    onGetTaskByWorkspace,
+    deleteCategory
 }
 
 export default connect (mapStateToProps, mapDispatchToProps) (Dashboard)

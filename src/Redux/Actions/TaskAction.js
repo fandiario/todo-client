@@ -113,3 +113,54 @@ export const createCategory = (category, idWorkspace, token) => {
         })
     }
 }
+
+export const deleteCategory = (idCategory,idWorkspace, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/delete-category`, {idCategory, token})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+                Axios.post (`${linkAPITask}/get-category-by-workspace`, {idWorkspace, token})
+
+                .then ((res) => {
+                    // console.log (res.data.data)
+
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_CATEGORY_SUCCESS",
+                            payload: res.data.data
+                        })
+
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_CATEGORY_ERROR",
+                            payload: res.data.message
+                        })
+                    }
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_CATEGORY_ERROR",
+                        payload: err.message
+                    })
+                })
+                
+            } else {
+                dispatch ({
+                    type: "DELETE_CATEGORY_ERROR",
+                    payload:res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "DELETE_CATEGORY_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}

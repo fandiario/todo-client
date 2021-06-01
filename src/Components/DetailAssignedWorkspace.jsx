@@ -48,7 +48,7 @@ class DetailAssignedWorkspace extends React.Component {
     render () {
         return (
             <div className="container">
-                <Modal isOpen= {this.state.showModal} toggle={() => this.onToggleModal()}>
+                <Modal isOpen= {this.state.showModal} toggle={() => this.onToggleModal()} className="todo-border-dark todo-border-rad5">
                     <ModalHeader>
                         Detail Workspace
                     </ModalHeader>
