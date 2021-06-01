@@ -30,6 +30,8 @@ class CreateWorkspace extends React.Component {
         } else {
             this.props.addWorkspace (title, token)
 
+            this.setState ({alerts: []})
+
             window.location = "/dashboard"
         }
     }

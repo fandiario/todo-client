@@ -19,6 +19,12 @@ const taskReducer = (state = initialState, action) => {
         case "GET_TASK_WORKSPACE_ERROR" : 
             return {...state, message: action.payload, error: true}
 
+        case "ADD_CATEGORY_SUCCESS" :
+            return {...state, message: action.payload, error: false}
+
+        case "ADD_CATEGORY_ERROR" :
+            return {...state, message: action.payload, error: true}
+
         default :
             return state
     }

@@ -624,7 +624,7 @@ class Dashboard extends React.Component {
                                                     Add New Categories ?
                                                 </span>
                                             </button> */}
-                                        <CreateCategory></CreateCategory>
+                                        <CreateCategory activeWorkspace={this.state.activeWorkspace}></CreateCategory>
                                         </div>
                                     :
                                         null
@@ -1212,7 +1212,7 @@ class Dashboard extends React.Component {
                                                                                 <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                                     <div className="d-flex justify-content-between mt-3">
                                                                                         <div className="col-2 p-1 todo-border-dark todo-bg-primary todo-border-rad5 mx-3 todo-fs-bold">
-                                                                                            {el.title}
+                                                                                            {el.category}
                                                                                         </div>
                                                                                         
                                                                                         <div className="mx-3">
@@ -1221,11 +1221,13 @@ class Dashboard extends React.Component {
                                                                                                     <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                                 </DropdownToggle>
                                                                                                 <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                    <DropdownItem>
-                                                                                                        <input type="button" value="Remove Category ?" className="btn"/>
-                                                                                                    </DropdownItem>
+                                                                                                    
                                                                                                     <DropdownItem>
                                                                                                         <input type="button" value="Add New Task ?" className="btn"/>
+                                                                                                    </DropdownItem>
+
+                                                                                                    <DropdownItem>
+                                                                                                        <input type="button" value="Remove Category ?" className="btn"/>
                                                                                                     </DropdownItem>
                                                                                                 </DropdownMenu>
                                                                                             </Dropdown>
