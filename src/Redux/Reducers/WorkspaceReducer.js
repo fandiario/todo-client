@@ -50,6 +50,18 @@ const workspaceReducer = (state = initialState, action) => {
 
         case "EDIT_WORKSPACE_ERROR" :
             return {...state, message: action.payload, error: true}
+        
+        case "CREATE_WORKSPACE_SUCCESS" :
+            return {...state, message: action.payload, error: false} 
+
+        case "CREATE_WORKSPACE_ERROR" :
+            return {...state, message: action.payload, error: true} 
+
+        case "DELETE_WORKSPACE_SUCCESS" :
+            return {...state, message: action.payload, error: false} 
+
+        case "DELETE_WORKSPACE_ERROR" :
+            return {...state, message: action.payload, error: true} 
 
         default:
             return state

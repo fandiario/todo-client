@@ -3,7 +3,7 @@ import React from "react"
 // Redux
 import {connect} from "react-redux"
 import {getDataUser} from "../Redux/Actions/UserAction"
-import {onGetWorkspaceUser, onGetWorkspaceByAssigned} from "../Redux/Actions/WorkspaceAction"
+import {onGetWorkspaceUser, onGetWorkspaceByAssigned, removeWorkspace} from "../Redux/Actions/WorkspaceAction"
 import {onGetCategoryByWorkspace, onGetTaskByWorkspace} from "../Redux/Actions/TaskAction"
 
 // Component
@@ -35,6 +35,7 @@ class Dashboard extends React.Component {
         activeWorkspace: null,
         taskWorkspaces: [],
         dropDownWorkspaces: [],
+        dropDownAssignedWorkspaces: [],
         dropDownCategories: [],
         dropDownTasks: [],
         modalEditWorkspaces: [],
@@ -135,10 +136,10 @@ class Dashboard extends React.Component {
 
     getAssignedWorkspace = () => {
         let token = localStorage.getItem ("token")
+        let arrDropDowns = []
+        let arrDetailAssignedWorkspaces = []
 
         this.props.onGetWorkspaceByAssigned (token)
-
-        let arrDetailAssignedWorkspaces = []
 
         if (this.props.workspace.assignedWorkspaces.data){
             // console.log ("test")
@@ -146,11 +147,46 @@ class Dashboard extends React.Component {
 
             for (let i = 0; i < (this.props.workspace.assignedWorkspaces.data).length; i++){
                 arrDetailAssignedWorkspaces.push (false)
+                arrDropDowns.push (false)
             }
         }
 
+        this.setState ({dropDownAssignedWorkspaces: arrDropDowns})
         this.setState ({modalDetailAssignedWorkspaces: arrDetailAssignedWorkspaces})
         // console.log (this.state.modalDetailAssignedWorkspaces)
+    }
+
+    onRemoveWorkspace = (idWorkspace) => {
+        let token = localStorage.getItem ("token")
+        // console.log (idWorkspace)
+
+        swal ({
+            title: "Delete ?",
+            text: "Are you sure you want to delete this workspace ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        })
+
+        .then ((res) => {
+            if (res) {
+                this.props.removeWorkspace (idWorkspace, token)
+
+                window.location = "/dashboard"
+            } else {
+                swal({
+                    title: "Cancelled!",
+                    text: "Workspace deletion has been cancelled",
+                    icon: "info",
+                  })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+        })
+
+        
     }
 
     // Category
@@ -226,6 +262,16 @@ class Dashboard extends React.Component {
         }
     }
 
+    toggleDropDownAssignedWorkspace = (i) => {
+        if (this.state.dropDownAssignedWorkspaces) {
+            let arrDropDownAssignedWorkspaces = this.state.dropDownAssignedWorkspaces
+
+            arrDropDownAssignedWorkspaces[i] = !(this.state.dropDownAssignedWorkspaces[i])
+
+            this.setState ({dropDownAssignedWorkspaces: arrDropDownAssignedWorkspaces})
+        }
+    }
+ 
     toggleDropdownCategory = (i) => {
         if (this.state.dropDownCategories) {
             let arrDropDownCategories = this.state.dropDownCategories
@@ -417,22 +463,24 @@ class Dashboard extends React.Component {
                                                             </DropdownToggle>
                                                             <DropdownMenu className=" todo-border-dark todo-border-rad5">
                                                                 <DropdownItem className="">
+                                                                    <input type="button" value="Detail Workspace" className="btn" onClick={() => this.onShowDetailWorkspace(i)}/>
+                                                                    
+                                                                    {/* Modal Detail Workspace */}
+                                                                    <DetailWorkspace idWorkspace={el.workspaces_id} stateModal={this.state.modalDetailWorkspaces[i]} indexWorkspace={i} toggleModalDetail = {this.onToggleDetailWorkspace}></DetailWorkspace>
+                                                                </DropdownItem>
+
+                                                                <DropdownItem className="">
                                                                     <input type="button" value="Edit This Workspace" className="btn" onClick={() => this.onShowEditWorkspace(i)}/>
 
                                                                     {/* Modal Edit Workspace */}
                                                                     <EditWorkspace idWorkspace={el.workspaces_id} indexWorkspace={i} stateModal={this.state.modalEditWorkspaces[i]} toggleModalEdit = {this.onToggleEditWorkspace}></EditWorkspace>
 
                                                                 </DropdownItem>
-                                                                <DropdownItem className="">
-                                                                    <input type="button" value="Remove This Workspace" className="btn"/>
-                                                                </DropdownItem>
-                                                                <DropdownItem className="">
-                                                                    <input type="button" value="Detail" className="btn" onClick={() => this.onShowDetailWorkspace(i)}/>
-                                                                    
-                                                                    {/* Modal Detail Workspace */}
-                                                                    <DetailWorkspace idWorkspace={el.workspaces_id} stateModal={this.state.modalDetailWorkspaces[i]} indexWorkspace={i} toggleModalDetail = {this.onToggleDetailWorkspace}></DetailWorkspace>
 
+                                                                <DropdownItem className="">
+                                                                    <input type="button" value="Remove This Workspace" className="btn" onClick={() => this.onRemoveWorkspace(el.workspaces_id)}/>
                                                                 </DropdownItem>
+
                                                             </DropdownMenu>
                                                         </Dropdown>
                                                     </div>
@@ -473,7 +521,7 @@ class Dashboard extends React.Component {
                                                         </button>
                                                     </div>
                                                     <div className="col-1 p-0">
-                                                        <Dropdown isOpen={this.state.dropDownWorkspaces[i]} toggle={() => this.toggleDropdownWorkspace(i)}>
+                                                        <Dropdown isOpen={this.state.dropDownAssignedWorkspaces[i]} toggle={() => this.toggleDropDownAssignedWorkspace(i)}>
                                                             <DropdownToggle className="btn todo-btn-primary todo-border-dark todo-border-rad5">
                                                                 <FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
                                                             </DropdownToggle>
@@ -1321,6 +1369,7 @@ const mapDispatchToProps = {
     getDataUser,
     onGetWorkspaceUser,
     onGetWorkspaceByAssigned,
+    removeWorkspace,
     onGetCategoryByWorkspace,
     onGetTaskByWorkspace
 }

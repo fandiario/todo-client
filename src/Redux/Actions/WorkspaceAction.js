@@ -118,6 +118,61 @@ export const getMembersWorkspace = (idWorkspace, token) => {
     }
 }
 
+export const addWorkspace = (title, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPIWorkspace}/create-workspace`, {title, token})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+
+                Axios.post (`${linkAPIWorkspace}/get-workspace-by-owner`, {token})
+
+                .then ((res) => {
+                    // console.log (res.data)
+
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_SUCCESS",
+                            payload: res.data
+                        })
+                    
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_ERROR",
+                            payload: res.data.message
+                        }) 
+                    }
+                    
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_WORKSPACE_USER_ERROR",
+                        payload: err.message
+                    })
+                })
+
+
+            } else {
+                dispatch ({
+                    type: "CREATE_WORKSPACE_ERROR",
+                    payload: res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "CREATE_WORKSPACE_ERROR",
+                payload: err.message
+            })
+        })
+    }
+    
+}
+ 
 export const addMemberWorkspace = (idWorkspace, token, email) => {
     return (dispatch) => {
         Axios.post (`${linkAPIWorkspace}/${idWorkspace}/assign-member`, {token, email})
@@ -159,6 +214,59 @@ export const addMemberWorkspace = (idWorkspace, token, email) => {
             console.log (err)
             dispatch ({
                 type: "ADD_MEMBER_ERROR",
+                payload: err.message
+            })
+        })
+    }
+}
+
+export const removeWorkspace = (idWorkspace, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPIWorkspace}/${idWorkspace}/delete-workspace`, {idWorkspace, token})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+
+                Axios.post (`${linkAPIWorkspace}/get-workspace-by-owner`, {token})
+
+                .then ((res) => {
+                    // console.log (res.data)
+
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_SUCCESS",
+                            payload: res.data
+                        })
+                    
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_WORKSPACE_USER_ERROR",
+                            payload: res.data.message
+                        }) 
+                    }
+                    
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_WORKSPACE_USER_ERROR",
+                        payload: err.message
+                    })
+                })
+
+            } else {
+                dispatch ({
+                    type: "DELETE_WORKSPACE_ERROR",
+                    payload: res.data.message
+                }) 
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "DELETE_WORKSPACE_ERROR",
                 payload: err.message
             })
         })
