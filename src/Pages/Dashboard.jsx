@@ -33,6 +33,7 @@ class Dashboard extends React.Component {
         // dataUser: null,
         dataWorkspace: null,
         activeWorkspace: null,
+        showCreateCategory: false,
         taskWorkspaces: [],
         dropDownWorkspaces: [],
         dropDownAssignedWorkspaces: [],
@@ -202,25 +203,62 @@ class Dashboard extends React.Component {
 
             for (let i = 0; i < (this.props.workspace.workspaces.data).length; i++){
                 if (this.props.workspace.workspaces.data[i].workspaces_id === idWorkspace) {
-                    this.setState ({activeWorkspace: {id: this.props.workspace.workspaces.data[i].workspaces_id, title: this.props.workspace.workspaces.data[i].title}})
+                    this.setState ({activeWorkspace: {id: this.props.workspace.workspaces.data[i].workspaces_id, title: this.props.workspace.workspaces.data[i].title, created_by_users_id: this.props.workspace.workspaces.data[i].created_by_users_id}})
                     arrDropDowns.push (false)
                 }
             }
 
-        } else if (this.props.workspace.assignedWorkspaces.data) {
-            for (let i = 0; i < (this.props.workspace.assignedWorkspaces.data).length; i++){
-                if (this.props.workspace.assignedWorkspaces.data[i].workspaces_id === idWorkspace) {
-                    this.setState ({activeWorkspace: {id: this.props.workspace.assignedWorkspaces.data[i].workspaces_id, title: this.props.workspace.assignedWorkspaces.data[i].title}})
-                    arrDropDowns.push (false)
-                }
-            }
-        }
+            this.setState ({showCreateCategory: true})
+
+        } 
+        
+        // else if (this.props.workspace.assignedWorkspaces.data) {
+
+        //     for (let i = 0; i < (this.props.workspace.assignedWorkspaces.data).length; i++){
+        //         if (this.props.workspace.assignedWorkspaces.data[i].workspaces_id === idWorkspace) {
+        //             this.setState ({activeWorkspace: {id: this.props.workspace.assignedWorkspaces.data[i].workspaces_id, title: this.props.workspace.assignedWorkspaces.data[i].title}})        
+        //             arrDropDowns.push (false)
+        //         }
+        //     }
+
+        //     this.setState ({showCreateCategory: false})
+        // }
             
         this.getTaskWorkspace (idWorkspace)
 
         this.setState ({dropDownCategories: arrDropDowns})
 
+        // console.log (this.props.workspace.workspaces.data)
+
         // console.log (this.state.activeWorkspace)
+
+        // console.log (this.props.user.dataUser)
+
+        // console.log (this.props.task.dataCategories)
+    }
+
+    getCategoryFromAssignedWorkspace = (idWorkspace) => {
+        let token = localStorage.getItem ("token")
+
+        this.props.onGetCategoryByWorkspace (idWorkspace, token)
+
+        let arrDropDowns = []
+
+        if (this.props.workspace.assignedWorkspaces.data) {
+
+            for (let i = 0; i < (this.props.workspace.assignedWorkspaces.data).length; i++){
+                if (this.props.workspace.assignedWorkspaces.data[i].workspaces_id === idWorkspace) {
+                    this.setState ({activeWorkspace: {id: this.props.workspace.assignedWorkspaces.data[i].workspaces_id, title: this.props.workspace.assignedWorkspaces.data[i].title}})        
+                    arrDropDowns.push (false)
+                }
+            }
+
+            this.setState ({showCreateCategory: false})
+        }
+            
+        this.getTaskWorkspace (idWorkspace)
+
+        this.setState ({dropDownCategories: arrDropDowns})
     }
 
     // Task
@@ -548,7 +586,7 @@ class Dashboard extends React.Component {
 
                                                 <div className="row d-flex align-items-center mb-1">
                                                     <div className="col-9 pl-3">
-                                                        <button className="btn todo-btn-primary p-0" onClick={() => this.getCategoryFromWorkspace (el.workspaces_id)}>
+                                                        <button className="btn todo-btn-primary p-0" onClick={() => this.getCategoryFromAssignedWorkspace (el.workspaces_id)}>
                                                             {el.title}
                                                         </button>
                                                     </div>
@@ -646,17 +684,10 @@ class Dashboard extends React.Component {
                                 
                                 {/* Buttons */}    
                                 {
-                                    this.props.task.dataCategories.length !== 0 ?
+                                    this.state.showCreateCategory === true ?
+
                                         <div className="mb-3 d-flex flex-row-reverse">
-                                            {/* <button className="btn btn-light todo-border-dark todo-border-rad5 shadow">
-                                                <span className="mr-3">
-                                                    <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                                                </span>
-                                                <span>
-                                                    Add New Categories ?
-                                                </span>
-                                            </button> */}
-                                        <CreateCategory activeWorkspace={this.state.activeWorkspace}></CreateCategory>
+                                            <CreateCategory activeWorkspace={this.state.activeWorkspace}></CreateCategory>
                                         </div>
                                     :
                                         null
