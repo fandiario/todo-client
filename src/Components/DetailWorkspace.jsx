@@ -132,7 +132,7 @@ class DetailWorkspace extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         {/* Alert */}
-                        {
+                        {/* {
                             this.state.alerts ?
                                 <div className="row mx-3 my-3 ">
                                     {
@@ -174,7 +174,7 @@ class DetailWorkspace extends React.Component {
                                 </div>
                             :
                                 null
-                        }
+                        } */}
 
                         {/* Detail */}
                         <div className="mb-3">
