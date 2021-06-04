@@ -2,7 +2,9 @@ let initialState = {
     error: false,
     message: null,
     dataCategories: [],
-    taskWorkspaces: []
+    taskWorkspaces: [],
+    dataTask: [],
+    assigneeTask: []
 }
 
 const taskReducer = (state = initialState, action) => {
@@ -18,6 +20,18 @@ const taskReducer = (state = initialState, action) => {
         
         case "GET_TASK_WORKSPACE_ERROR" : 
             return {...state, message: action.payload, error: true}
+
+        case "GET_DATA_TASK_SUCCESS" :
+            return {...state, dataTask: action.payload, error: false}
+
+        case "GET_DATA_TASK_ERROR" :
+            return {...state, message: action.payload, error: true}
+
+        case "GET_DATA_ASSIGNEE_SUCCESS" :
+            return {...state, error: false, assigneeTask: action.payload}
+    
+        case "GET_DATA_ASSIGNEE_ERROR" :
+            return {...state, error: true, message: action.payload}
 
         case "ADD_CATEGORY_SUCCESS" :
             return {...state, message: action.payload, error: false}

@@ -114,6 +114,68 @@ export const createCategory = (category, idWorkspace, token) => {
     }
 }
 
+export const getDataTask = (idTask) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/get-data-task`, {idTask})
+
+        .then ((res) => {
+
+            // console.log (res)
+
+            if (res.data.error === false) {
+                dispatch ({
+                    type: "GET_DATA_TASK_SUCCESS",
+                    payload:res.data
+                })
+
+            } else {
+                dispatch ({
+                    type: "GET_DATA_TASK_ERROR",
+                    payload:res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "GET_DATA_TASK_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}
+
+export const getAssigneeTask = (idTask) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/get-assignee-from-task`, {idTask})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+                dispatch ({
+                    type: "GET_DATA_ASSIGNEE_SUCCESS",
+                    payload:res.data.data
+                })
+
+            } else {
+                dispatch ({
+                    type: "GET_DATA_ASSIGNEE_ERROR",
+                    payload:res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "GET_DATA_ASSIGNEE_ERROR",
+                payload:err.message
+            })
+        })
+    }
+    
+}
+
 export const deleteCategory = (idCategory,idWorkspace, token) => {
     return (dispatch) => {
         Axios.post (`${linkAPITask}/delete-category`, {idCategory, token})

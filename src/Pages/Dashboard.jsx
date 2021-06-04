@@ -844,77 +844,75 @@ class Dashboard extends React.Component {
                                                                                                 val.category_tasks_id === 1 ?
                                                                                                     <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                         
-                                                                                                        <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                            <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                    <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                </DropdownToggle>
+                                                                                                        <div className="row d-flex justify-content-between">
 
-                                                                                                                <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                    <DropdownItem>
-                                                                                                                        <input type="button" value="Set to On Going" className="btn"/>
-                                                                                                                    </DropdownItem>
-                                                                                                                    <DropdownItem>
-                                                                                                                        <input type="button" value="Set to Cancelled" className="btn"/>
-                                                                                                                    </DropdownItem>
-                                                                                                                    <DropdownItem>
-                                                                                                                        <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                    </DropdownItem>
-                                                                                                                    <DropdownItem>
-                                                                                                                        <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                    </DropdownItem>
-                                                                                                                    <DropdownItem>
-                                                                                                                        <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+                                                                                                            <div className="mb-1 col-9">
+                                                                                                                
+                                                                                                                <div className="row">
+                                                                                                                    <div className="col-6">
+                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                            Start:
+                                                                                                                        </div>
+                                                                                                                        <div className="mb-1">
+                                                                                                                            {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                        </div>
+                                                                                                                    </div>
 
-                                                                                                                        {/* Modal Detail Task */}
-                                                                                                                        <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
-                                                                                                                    </DropdownItem>
-                                                                                                                </DropdownMenu>
-                                                                                                            </Dropdown>
+                                                                                                                    <div className="col-6">
+                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                            End:
+                                                                                                                        </div>
+                                                                                                                        <div className="mb-1">
+                                                                                                                            {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                        </div>   
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                            <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
+                                                                                                                    <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                        <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                    </DropdownToggle>
+
+                                                                                                                    <DropdownMenu className="todo-border-dark todo-border-rad5">
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Set to On Going" className="btn"/>
+                                                                                                                        </DropdownItem>
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Set to Cancelled" className="btn"/>
+                                                                                                                        </DropdownItem>
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Edit This Task" className="btn"/>
+                                                                                                                        </DropdownItem>
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Remove This Task" className="btn"/>
+                                                                                                                        </DropdownItem>
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                            {/* Modal Detail Task */}
+                                                                                                                            <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                        </DropdownItem>
+                                                                                                                    </DropdownMenu>
+                                                                                                                </Dropdown>
+                                                                                                            </div>
                                                                                                         </div>
 
+                                                                                                        <div className="todo-fs-bold">
+                                                                                                            Title: 
+                                                                                                        </div>
                                                                                                         <div className="mb-1">
-                                                                                                            <div className="todo-fs-bold">
-                                                                                                                Title: 
-                                                                                                            </div>
-                                                                                                            <div>
-                                                                                                                {val.title}
-                                                                                                            </div>
+                                                                                                            {val.title}
                                                                                                         </div>
                                                                                                         
                                                                                                         <div className="todo-fs-bold">
                                                                                                             Description:
                                                                                                         </div>
-                                                                                                        <div className="mb-3">
+                                                                                                        <div className="mb-1">
                                                                                                             {val.description}
                                                                                                         </div>
-
-                                                                                                        {/* <div className="mb-1">
-                                                                                                            <span className="todo-fs-bold">
-                                                                                                                Start:
-                                                                                                            </span>
-                                                                                                            <span>
-                                                                                                                {(new Date (val.date_start)).toLocaleString()}
-                                                                                                            </span>
-                                                                                                        </div>
-
-                                                                                                        <div className="mb-1">
-                                                                                                            <span className="todo-fs-bold">
-                                                                                                                End:
-                                                                                                            </span>
-                                                                                                            <span>
-                                                                                                                {(new Date (val.date_end)).toLocaleString()}
-                                                                                                            </span>
-                                                                                                        </div> */}
-
-                                                                                                        <div className="mb-1">
-                                                                                                            {/* <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onShowDetailTask(index)}>
-                                                                                                                Detail
-                                                                                                            </button>
-
-                                                                                                            {/* Modal Detail Task */}
-                                                                                                            {/* <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask> */} 
-                                                                                                        </div>
+                                                                                                                                                                                                             
                                                                                                     </div>
                                                                                                     
                                                                                                 :
