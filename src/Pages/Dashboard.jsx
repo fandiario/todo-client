@@ -319,6 +319,28 @@ class Dashboard extends React.Component {
        
     }
 
+    onEditTask = () => {
+        if (this.state.activeWorkspace.created_by_users_id === this.props.user.dataUser.id){
+
+            // let arrModalAddTasks = this.state.modalAddTasks
+
+            // arrModalAddTasks[index] = true
+
+            // this.setState ({modalAddTasks: arrModalAddTasks})
+
+            console.log ("ok")
+
+        } else {
+            swal ({
+                title: "Forbidden !",
+                text: "Unauthorized account. You can't edit task from assigned workspace.",
+                icon: "error",
+                buttons: true,
+                dangerMode: true
+            })
+        }
+    }
+
     // setModalDetailTasks = () => {
     //     console.log (this.props.task.taskWorkspaces)
     //     console.log (this.state.modalDetailTasks)
@@ -515,6 +537,10 @@ class Dashboard extends React.Component {
         arrModalAddTasks[data.index] = data.state
 
         this.setState ({modalAddTasks: arrModalAddTasks})
+
+        // console.log (data)
+        // console.log (data.idWorkspace)
+        // console.log (data.category_tasks_category_at_workspaces_id)
     }
 
         // Task
@@ -824,7 +850,7 @@ class Dashboard extends React.Component {
                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
                                                                                     
                                                                                         {/* Modal Add New Task */}
-                                                                                        <CreateTask idCategory={el.id} indexCategory={i} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el.category_at_workspaces_id} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
                                                                                         
                                                                                     </DropdownItem>
                                                                                 </DropdownMenu>
@@ -883,7 +909,7 @@ class Dashboard extends React.Component {
                                                                                                                             <input type="button" value="Set to Cancelled" className="btn"/>
                                                                                                                         </DropdownItem>
                                                                                                                         <DropdownItem>
-                                                                                                                            <input type="button" value="Edit This Task" className="btn"/>
+                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask()}/>
                                                                                                                         </DropdownItem>
                                                                                                                         <DropdownItem>
                                                                                                                             <input type="button" value="Remove This Task" className="btn"/>
@@ -949,10 +975,11 @@ class Dashboard extends React.Component {
                                                                                             <input type="button" value="Remove Category ?" className="btn"/>
                                                                                         </DropdownItem> */}
                                                                                         <DropdownItem>
-                                                                                            <input type="button" value="Add New Task ?" className="btn"  onClick={() => this.onShowAddTask(i)}/>
-
+                                                                                            <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
+                                                                                        
                                                                                             {/* Modal Add New Task */}
-                                                                                            <CreateTask idCategory={el.id} indexCategory={i} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                            <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                            
                                                                                         </DropdownItem>
                                                                                     </DropdownMenu>
                                                                                 </Dropdown>
@@ -1289,9 +1316,10 @@ class Dashboard extends React.Component {
                                                                                                     </DropdownItem> */}
                                                                                                     <DropdownItem>
                                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
-
+                                                                                                    
                                                                                                         {/* Modal Add New Task */}
-                                                                                                        <CreateTask idCategory={el.id} indexCategory={i} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        
                                                                                                     </DropdownItem>
                                                                                                 </DropdownMenu>
                                                                                             </Dropdown>
@@ -1406,9 +1434,10 @@ class Dashboard extends React.Component {
                                                                                                     
                                                                                                     <DropdownItem>
                                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
-
+                                                                                                    
                                                                                                         {/* Modal Add New Task */}
-                                                                                                        <CreateTask idCategory={el.id} indexCategory={i} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        
                                                                                                     </DropdownItem>
 
                                                                                                     <DropdownItem>

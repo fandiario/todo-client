@@ -39,6 +39,12 @@ const taskReducer = (state = initialState, action) => {
         case "ADD_CATEGORY_ERROR" :
             return {...state, message: action.payload, error: true}
 
+        case "ADD_TASK_SUCCESS" :
+            return {...state, message: action.payload, error: false}
+        
+        case "ADD_TASK_ERROR" :
+            return {...state, message: action.payload, error: true}
+
         case "DELETE_CATEGORY_SUCCESS" :
             return {...state, message: action.payload, error: false}
 

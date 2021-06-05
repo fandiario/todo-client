@@ -36,6 +36,11 @@ class CreateWorkspace extends React.Component {
         }
     }
 
+    onToggleModal = () => {
+        this.setState ({alerts: []})
+        this.setState ({showModal: false})
+    }
+
     render () {
         return (
             <div>
@@ -55,6 +60,25 @@ class CreateWorkspace extends React.Component {
                         Add New Workspace
                     </ModalHeader>
                     <ModalBody>
+                        {/* Alert */}
+                        {
+                            this.state.alerts.length > 0 ?
+                                <div className="row mx-3 my-3 ">
+                                    {
+                                        this.state.alerts.map ((el, i) => {
+                                            return (
+                                                <div key={i} className="col-12 d-flex justify-content-center">
+                                                    <div className="alert alert-danger todo-border-dark todo-border-rad5">
+                                                        {el}  
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            :
+                                null
+                        }
                         <form className="col-12">
                             <div className="mb-3 form-group">
                                 <label className="form-label todo-fs-bold">
@@ -83,7 +107,7 @@ class CreateWorkspace extends React.Component {
                         <button className="btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onSubmitCreateWorkplace ()}>
                             Submit 
                         </button>
-                        <button className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.setState ({showModal: !(this.state.showModal)})}>
+                        <button className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onToggleModal ()}>
                             Cancel
                         </button>
                     </ModalFooter>

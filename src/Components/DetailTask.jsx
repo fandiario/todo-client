@@ -140,7 +140,7 @@ class DetailTask extends React.Component {
                             </div>
                             <div className="">
                                 {
-                                    this.props.task.assigneeTask.length > 0 ?
+                                    this.props.task.assigneeTask ?
                                         this.props.task.assigneeTask.map ((el, i) => {
                                             return (
                                                 <div key={i}>

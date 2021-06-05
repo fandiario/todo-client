@@ -72,7 +72,7 @@ class CreateCategory extends React.Component {
                     <ModalBody>
                         {/* Alert */}
                         {
-                            this.state.alerts ?
+                            this.state.alerts.length > 0 ?
                                 <div className="row mx-3 my-3 ">
                                     {
                                         this.state.alerts.map ((el, i) => {

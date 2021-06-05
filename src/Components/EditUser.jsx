@@ -80,6 +80,11 @@ class EditUser extends React.Component {
     //     // console.log (this.props.user.dataUser)
     // }
 
+    onToggleModal = () => {
+        this.setState ({alerts: []})
+        this.setState ({showModal: false})
+    }
+
     render () {
         return (
             <div>
@@ -97,7 +102,7 @@ class EditUser extends React.Component {
                     <ModalBody>
                         {/* Alert */}
                         {
-                            this.state.alerts ?
+                            this.state.alerts.length > 0 ?
                                 <div className="row mx-3 my-3 ">
                                     {
                                         this.state.alerts.map ((el, i) => {
@@ -143,7 +148,7 @@ class EditUser extends React.Component {
                         <button className="btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onSubmitEdit()}>
                             Submit 
                         </button>
-                        <button className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.setState ({showModal: !(this.state.showModal)})}>
+                        <button className="btn todo-btn-danger todo-border-dark todo-border-rad5 todo-fs-bold" onClick={() => this.onToggleModal ()}>
                             Cancel
                         </button>
                     </ModalFooter>
