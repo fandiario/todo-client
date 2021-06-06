@@ -66,19 +66,6 @@ class CreateTask extends React.Component {
 
         } else {
 
-            // let data = {
-            //     title: title,
-            //     description: description,
-            //     date_start: date_start,
-            //     date_end: date_end,
-            //     token: token,
-            //     category_tasks_id: category_tasks_id,
-            //     category_tasks_category_at_workspaces_id: category_tasks_category_at_workspaces_id,
-            //     idWorkspace: idWorkspace
-            // }
-
-            // console.log (data)
-
             this.props.createTask (title, description, date_start, date_end, token, category_tasks_id, category_tasks_category_at_workspaces_id, idWorkspace)
             
             this.setState ({alerts: []})
@@ -117,7 +104,6 @@ class CreateTask extends React.Component {
                             :
                                 null
                         }
-
 
                         {/*Form  */}
                        <form>

@@ -4,7 +4,7 @@ import React from "react"
 import {connect} from "react-redux"
 import {getDataUser} from "../Redux/Actions/UserAction"
 import {onGetWorkspaceUser, onGetWorkspaceByAssigned, removeWorkspace} from "../Redux/Actions/WorkspaceAction"
-import {onGetCategoryByWorkspace, onGetTaskByWorkspace, deleteCategory} from "../Redux/Actions/TaskAction"
+import {onGetCategoryByWorkspace, onGetTaskByWorkspace, getDataTask, editTask, deleteCategory, deleteTask} from "../Redux/Actions/TaskAction"
 
 // Component
 import Logo from "../Components/Logo"
@@ -319,7 +319,63 @@ class Dashboard extends React.Component {
        
     }
 
-    onEditTask = () => {
+    onSetToCategory = (dataTask, idCategory, titleCategory, dataCategory) => {
+        let idTask = dataTask.id
+        let token = localStorage.getItem ("token")
+
+        this.props.getDataTask (idTask)
+
+        // Convert Time Start
+        let dataDateStart = this.props.task.dataTask.date_start
+        let dateStart = dataDateStart.slice(0, 10)
+        let timeStart = new Date (dataDateStart).toLocaleTimeString()
+        let timeStartRes = timeStart.slice(0,8)
+        let resultDateStart = dateStart + " " + timeStartRes
+
+        // Convert Time End
+        let dataDateEnd = this.props.task.dataTask.date_end
+        let dateEnd = dataDateEnd.slice (0, 10)
+        let timeEnd = new Date (dataDateEnd).toLocaleTimeString()
+        let timeEndRes = timeEnd.slice(0, 8)
+        let resultDateEnd = dateEnd + " " + timeEndRes
+
+        // Data To Send
+        let title = this.props.task.dataTask.title
+        let description = this.props.task.dataTask.description
+        let date_start = resultDateStart
+        let date_end = resultDateEnd
+        let category_tasks_id = idCategory
+        let idWorkspace = dataTask.workspaces_id
+        let category_tasks_category_at_workspaces_id = dataCategory.category_at_workspaces_id
+        let category_at_workspaces_id = dataCategory.category_at_workspaces_id
+
+        // console.log (dataTask)
+        // console.log (dataCategory)
+
+        swal ({
+            title: `Set to ${titleCategory} ?`,
+            text: `Are you sure you want to set this task to ${titleCategory} category ?`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        })
+
+        .then ((res) => {
+            if (res) {
+                this.props.editTask (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token)
+
+                // window.location = "/dashboard"
+            } else {
+                swal({
+                    title: "Cancelled!",
+                    text: "Data Update has been cancelled",
+                    icon: "info",
+                })
+            }
+        })
+    }
+
+    onEditTask = (idTask) => {
         if (this.state.activeWorkspace.created_by_users_id === this.props.user.dataUser.id){
 
             // let arrModalAddTasks = this.state.modalAddTasks
@@ -328,7 +384,7 @@ class Dashboard extends React.Component {
 
             // this.setState ({modalAddTasks: arrModalAddTasks})
 
-            console.log ("ok")
+            console.log (idTask)
 
         } else {
             swal ({
@@ -341,10 +397,46 @@ class Dashboard extends React.Component {
         }
     }
 
-    // setModalDetailTasks = () => {
-    //     console.log (this.props.task.taskWorkspaces)
-    //     console.log (this.state.modalDetailTasks)
-    // }
+    onRemoveTask = (idWorkspace, idTask) => {
+        // console.log (idWorkspace)
+        // console.log (idTask)
+
+        let token = localStorage.getItem ("token")
+
+        if (this.state.activeWorkspace.created_by_users_id === this.props.user.dataUser.id){
+
+            swal ({
+                title: "Delete ?",
+                text: "Are you sure you want to delete this task ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            })
+    
+            .then ((res) => {
+                if (res) {
+                    this.props.deleteTask(idWorkspace, idTask, token)
+    
+                    // window.location = "/dashboard"
+                } else {
+                    swal({
+                        title: "Cancelled!",
+                        text: "Workspace deletion has been cancelled",
+                        icon: "info",
+                    })
+                }
+            })
+
+        } else {
+            swal ({
+                title: "Forbidden !",
+                text: "Unauthorized account. You can't edit task from assigned workspace.",
+                icon: "error",
+                buttons: true,
+                dangerMode: true
+            })
+        }
+    }
 
 
 
@@ -585,6 +677,10 @@ class Dashboard extends React.Component {
         //     console.log (this.state.dataWorkspace)
         // }
 
+        // if (this.state.activeWorkspace) {
+        //     console.log (this.state.activeWorkspace)
+        // }
+
         // if (!(this.state.dataUser)) {
         //     return (
         //         <div className="container">
@@ -822,6 +918,10 @@ class Dashboard extends React.Component {
                                 }
 
                                 {/* Categories */}
+
+
+
+                                
                                 <div className="mb-3">
                                     {
                                         this.props.task.dataCategories.length !== 0 ?
@@ -829,7 +929,7 @@ class Dashboard extends React.Component {
                                                 return (
                                                     <div key={i}>
                                                         {
-                                                            el.category === "to do" ?
+                                                            el.id === 1 ?
                                                                 <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                     
                                                                     <div className="d-flex justify-content-between mt-3">
@@ -843,9 +943,7 @@ class Dashboard extends React.Component {
                                                                                     <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                 </DropdownToggle>
                                                                                 <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                    {/* <DropdownItem>
-                                                                                        <input type="button" value="Remove Category ?" className="btn"/>
-                                                                                    </DropdownItem> */}
+                                                    
                                                                                     <DropdownItem>
                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
                                                                                     
@@ -853,6 +951,7 @@ class Dashboard extends React.Component {
                                                                                         <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el.category_at_workspaces_id} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
                                                                                         
                                                                                     </DropdownItem>
+
                                                                                 </DropdownMenu>
                                                                             </Dropdown>
                                                                         </div>
@@ -863,6 +962,7 @@ class Dashboard extends React.Component {
                                                                     <div>
                                                                         {
                                                                             this.props.task.taskWorkspaces ?
+                                                                                
                                                                                 this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                     return (
                                                                                         <div key={index}>
@@ -896,24 +996,39 @@ class Dashboard extends React.Component {
                                                                                                             </div>
 
                                                                                                             <div className="mb-1 col-2 d-flex flex-row-reverse">
-                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
+                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
                                                                                                                     <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
                                                                                                                         <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                                                     </DropdownToggle>
 
                                                                                                                     <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                        {
+                                                                                                                            this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                return (
+                                                                                                                                    <div key={ind}>
+                                                                                                                                        {
+                                                                                                                                            element.id !== el.id && element.id !== 3 ?
+                                                                                                                                                <DropdownItem>
+                                                                                                                                                    <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id, element.category, element)}/>
+                                                                                                                                                </DropdownItem>
+                                                                                                                                            :
+                                                                                                                                                null
+                                                                                                                                        }   
+                                                                                                                                        
+                                                                                                                                    </div>
+                                                                                                                                )
+                                                                                                                            })
+                                                                                                                        }
+
                                                                                                                         <DropdownItem>
-                                                                                                                            <input type="button" value="Set to On Going" className="btn"/>
+                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
                                                                                                                         </DropdownItem>
+
                                                                                                                         <DropdownItem>
-                                                                                                                            <input type="button" value="Set to Cancelled" className="btn"/>
+                                                                                                                            <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
                                                                                                                         </DropdownItem>
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask()}/>
-                                                                                                                        </DropdownItem>
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                        </DropdownItem>
+
                                                                                                                         <DropdownItem>
                                                                                                                             <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
 
@@ -921,6 +1036,7 @@ class Dashboard extends React.Component {
                                                                                                                             <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
                                                                                                                         </DropdownItem>
                                                                                                                     </DropdownMenu>
+                                                                                                                
                                                                                                                 </Dropdown>
                                                                                                             </div>
                                                                                                         </div>
@@ -938,12 +1054,12 @@ class Dashboard extends React.Component {
                                                                                                         <div className="mb-1">
                                                                                                             {val.description}
                                                                                                         </div>
-                                                                                                                                                                                                             
+                                                                                                                                                                                                            
                                                                                                     </div>
                                                                                                     
                                                                                                 :
                                                                                                     <div className="ml-3 my-3">
-                                                                                                        You don't have any task in this category.
+                                                                                                        
                                                                                                     </div>
                                                                                             }
                                                                                         </div>
@@ -955,10 +1071,11 @@ class Dashboard extends React.Component {
                                                                                 </div>
                                                                         }
                                                                     </div>
+                                                                    
                                                                 </div>
                                                                 
                                                             :
-                                                                el.category === "on going" ?
+                                                                el.id === 2 ?
                                                                     <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                         <div className="d-flex justify-content-between mt-3">
                                                                             <div className="col-2 p-1 todo-border-dark todo-bg-secondary text-light todo-border-rad5 mx-3 todo-fs-bold">
@@ -971,16 +1088,15 @@ class Dashboard extends React.Component {
                                                                                         <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                     </DropdownToggle>
                                                                                     <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                        {/* <DropdownItem>
-                                                                                            <input type="button" value="Remove Category ?" className="btn"/>
-                                                                                        </DropdownItem> */}
+                                                        
                                                                                         <DropdownItem>
                                                                                             <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
                                                                                         
                                                                                             {/* Modal Add New Task */}
-                                                                                            <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                            <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el.category_at_workspaces_id} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
                                                                                             
                                                                                         </DropdownItem>
+                                                                                        
                                                                                     </DropdownMenu>
                                                                                 </Dropdown>
                                                                             </div>
@@ -990,6 +1106,7 @@ class Dashboard extends React.Component {
                                                                         <div>
                                                                             {
                                                                                 this.props.task.taskWorkspaces ?
+                                                                                    
                                                                                     this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                         return (
                                                                                             <div key={index}>
@@ -997,73 +1114,96 @@ class Dashboard extends React.Component {
                                                                                                     val.category_tasks_id === 2 ?
                                                                                                         <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                             
-                                                                                                            <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                    <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                        <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                    </DropdownToggle>
+                                                                                                            <div className="row d-flex justify-content-between">
 
-                                                                                                                    <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Set to Done" className="btn"/>
-                                                                                                                        </DropdownItem>
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Set to Cancelled" className="btn"/>
-                                                                                                                        </DropdownItem>
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                        </DropdownItem>
-                                                                                                                        <DropdownItem>
-                                                                                                                            <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                        </DropdownItem>
-                                                                                                                    </DropdownMenu>
-                                                                                                                </Dropdown>
+                                                                                                                <div className="mb-1 col-9">
+                                                                                                                    
+                                                                                                                    <div className="row">
+                                                                                                                        <div className="col-6">
+                                                                                                                            <div className="todo-fs-bold">
+                                                                                                                                Start:
+                                                                                                                            </div>
+                                                                                                                            <div className="mb-1">
+                                                                                                                                {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                            </div>
+                                                                                                                        </div>
+
+                                                                                                                        <div className="col-6">
+                                                                                                                            <div className="todo-fs-bold">
+                                                                                                                                End:
+                                                                                                                            </div>
+                                                                                                                            <div className="mb-1">
+                                                                                                                                {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                            </div>   
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </div>
+
+                                                                                                                <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                    <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
+                                                                                                                        <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                            <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                        </DropdownToggle>
+
+                                                                                                                        <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                            {
+                                                                                                                                this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                    return (
+                                                                                                                                        <div key={ind}>
+                                                                                                                                            {
+                                                                                                                                                element.id !== el.id && element.id !== 1 ?
+                                                                                                                                                    <DropdownItem>
+                                                                                                                                                        <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id, element.category, element)}/>
+                                                                                                                                                    </DropdownItem>
+                                                                                                                                                :
+                                                                                                                                                    null
+                                                                                                                                            }   
+                                                                                                                                            
+                                                                                                                                        </div>
+                                                                                                                                    )
+                                                                                                                                })
+                                                                                                                            }
+
+                                                                                                                            <DropdownItem>
+                                                                                                                                <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                            </DropdownItem>
+
+                                                                                                                            <DropdownItem>
+                                                                                                                                <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
+                                                                                                                            </DropdownItem>
+
+                                                                                                                            <DropdownItem>
+                                                                                                                                <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                                {/* Modal Detail Task */}
+                                                                                                                                <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                            </DropdownItem>
+                                                                                                                        </DropdownMenu>
+                                                                                                                    
+                                                                                                                    </Dropdown>
+                                                                                                                </div>
                                                                                                             </div>
 
+                                                                                                            <div className="todo-fs-bold">
+                                                                                                                Title: 
+                                                                                                            </div>
                                                                                                             <div className="mb-1">
-                                                                                                                <div className="todo-fs-bold">
-                                                                                                                    Title: 
-                                                                                                                </div>
-                                                                                                                <div>
-                                                                                                                    {val.title}
-                                                                                                                </div>
+                                                                                                                {val.title}
                                                                                                             </div>
                                                                                                             
                                                                                                             <div className="todo-fs-bold">
                                                                                                                 Description:
                                                                                                             </div>
-                                                                                                            <div className="mb-3">
+                                                                                                            <div className="mb-1">
                                                                                                                 {val.description}
                                                                                                             </div>
-
-                                                                                                            {/* <div className="mb-1">
-                                                                                                                <span className="todo-fs-bold">
-                                                                                                                    Start:
-                                                                                                                </span>
-                                                                                                                <span>
-                                                                                                                    {(new Date (val.date_start)).toLocaleString()}
-                                                                                                                </span>
-                                                                                                            </div>
-
-                                                                                                            <div className="mb-1">
-                                                                                                                <span className="todo-fs-bold">
-                                                                                                                    End:
-                                                                                                                </span>
-                                                                                                                <span>
-                                                                                                                    {(new Date (val.date_end)).toLocaleString()}
-                                                                                                                </span>
-                                                                                                            </div> */}
-
-                                                                                                            <div className="mb-1">
-                                                                                                                <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold">
-                                                                                                                    Detail
-                                                                                                                </button>
-                                                                                                            </div>
+                                                                                                                                                                                                                
                                                                                                         </div>
                                                                                                         
                                                                                                     :
                                                                                                         <div className="ml-3 my-3">
-                                                                                                            You don't have any task in this category.
+                                                                                                            
                                                                                                         </div>
                                                                                                 }
                                                                                             </div>
@@ -1078,7 +1218,7 @@ class Dashboard extends React.Component {
                                                                     </div>
                                                                     
                                                                 :
-                                                                    el.category === "done" ?
+                                                                    el.id === 3 ?
                                                                         <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                             <div className="d-flex justify-content-between mt-3">
                                                                                 <div className="col-2 p-1 todo-border-dark todo-bg-success todo-border-rad5 mx-3 todo-fs-bold">
@@ -1106,6 +1246,7 @@ class Dashboard extends React.Component {
                                                                             <div>
                                                                                 {
                                                                                     this.props.task.taskWorkspaces ?
+                                                                                        
                                                                                         this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                             return (
                                                                                                 <div key={index}>
@@ -1113,67 +1254,96 @@ class Dashboard extends React.Component {
                                                                                                         val.category_tasks_id === 3 ?
                                                                                                             <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                                 
-                                                                                                                <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                                    <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                        <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                            <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                        </DropdownToggle>
+                                                                                                                <div className="row d-flex justify-content-between">
 
-                                                                                                                        <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                            <DropdownItem>
-                                                                                                                                <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                            </DropdownItem>
-                                                                                                                            <DropdownItem>
-                                                                                                                                <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                            </DropdownItem>
-                                                                                                                        </DropdownMenu>
-                                                                                                                    </Dropdown>
+                                                                                                                    <div className="mb-1 col-9">
+                                                                                                                        
+                                                                                                                        <div className="row">
+                                                                                                                            <div className="col-6">
+                                                                                                                                <div className="todo-fs-bold">
+                                                                                                                                    Start:
+                                                                                                                                </div>
+                                                                                                                                <div className="mb-1">
+                                                                                                                                    {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                            <div className="col-6">
+                                                                                                                                <div className="todo-fs-bold">
+                                                                                                                                    End:
+                                                                                                                                </div>
+                                                                                                                                <div className="mb-1">
+                                                                                                                                    {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                                </div>   
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </div>
+
+                                                                                                                    <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                        <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
+                                                                                                                            <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                                <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                            </DropdownToggle>
+
+                                                                                                                            <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                                {/* {
+                                                                                                                                    this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                        return (
+                                                                                                                                            <div key={ind}>
+                                                                                                                                                {
+                                                                                                                                                    element.id !== el.id && element.id !== 1 ?
+                                                                                                                                                        <DropdownItem>
+                                                                                                                                                            <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id)}/>
+                                                                                                                                                        </DropdownItem>
+                                                                                                                                                    :
+                                                                                                                                                        null
+                                                                                                                                                }   
+                                                                                                                                                
+                                                                                                                                            </div>
+                                                                                                                                        )
+                                                                                                                                    })
+                                                                                                                                } */}
+
+                                                                                                                                {/* <DropdownItem>
+                                                                                                                                    <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                </DropdownItem>
+
+                                                                                                                                <DropdownItem>
+                                                                                                                                    <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
+                                                                                                                                </DropdownItem> */}
+
+                                                                                                                                <DropdownItem>
+                                                                                                                                    <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                                    {/* Modal Detail Task */}
+                                                                                                                                    <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                                </DropdownItem>
+                                                                                                                            </DropdownMenu>
+                                                                                                                        
+                                                                                                                        </Dropdown>
+                                                                                                                    </div>
                                                                                                                 </div>
 
+                                                                                                                <div className="todo-fs-bold">
+                                                                                                                    Title: 
+                                                                                                                </div>
                                                                                                                 <div className="mb-1">
-                                                                                                                    <div className="todo-fs-bold">
-                                                                                                                        Title: 
-                                                                                                                    </div>
-                                                                                                                    <div>
-                                                                                                                        {val.title}
-                                                                                                                    </div>
+                                                                                                                    {val.title}
                                                                                                                 </div>
                                                                                                                 
                                                                                                                 <div className="todo-fs-bold">
                                                                                                                     Description:
                                                                                                                 </div>
-                                                                                                                <div className="mb-3">
+                                                                                                                <div className="mb-1">
                                                                                                                     {val.description}
                                                                                                                 </div>
-
-                                                                                                                {/* <div className="mb-1">
-                                                                                                                    <span className="todo-fs-bold">
-                                                                                                                        Start:
-                                                                                                                    </span>
-                                                                                                                    <span>
-                                                                                                                        {(new Date (val.date_start)).toLocaleString()}
-                                                                                                                    </span>
-                                                                                                                </div>
-
-                                                                                                                <div className="mb-1">
-                                                                                                                    <span className="todo-fs-bold">
-                                                                                                                        End:
-                                                                                                                    </span>
-                                                                                                                    <span>
-                                                                                                                        {(new Date (val.date_end)).toLocaleString()}
-                                                                                                                    </span>
-                                                                                                                </div> */}
-
-                                                                                                                <div className="mb-1">
-                                                                                                                    <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold">
-                                                                                                                        Detail
-                                                                                                                    </button>
-                                                                                                                </div>
+                                                                                                                                                                                                                    
                                                                                                             </div>
                                                                                                             
                                                                                                         :
                                                                                                             <div className="ml-3 my-3">
-                                                                                                                You don't have any task in this category.
+                                                                                                                
                                                                                                             </div>
                                                                                                     }
                                                                                                 </div>
@@ -1188,7 +1358,7 @@ class Dashboard extends React.Component {
                                                                         </div>
                                                                         
                                                                     :
-                                                                        el.category === "cancelled" ?
+                                                                        el.id === 4 ?
                                                                             <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                                 <div className="d-flex justify-content-between mt-3">
                                                                                     <div className="col-2 p-1 todo-border-dark todo-bg-dark text-light todo-border-rad5 mx-3 todo-fs-bold">
@@ -1216,6 +1386,7 @@ class Dashboard extends React.Component {
                                                                                 <div>
                                                                                     {
                                                                                         this.props.task.taskWorkspaces ?
+                                                                                            
                                                                                             this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                                 return (
                                                                                                     <div key={index}>
@@ -1223,67 +1394,96 @@ class Dashboard extends React.Component {
                                                                                                             val.category_tasks_id === 4 ?
                                                                                                                 <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                                     
-                                                                                                                    <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                                        <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                            <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                                <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                            </DropdownToggle>
+                                                                                                                    <div className="row d-flex justify-content-between">
 
-                                                                                                                            <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                                <DropdownItem>
-                                                                                                                                    <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                                </DropdownItem>
-                                                                                                                                <DropdownItem>
-                                                                                                                                    <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                                </DropdownItem>
-                                                                                                                            </DropdownMenu>
-                                                                                                                        </Dropdown>
+                                                                                                                        <div className="mb-1 col-9">
+                                                                                                                            
+                                                                                                                            <div className="row">
+                                                                                                                                <div className="col-6">
+                                                                                                                                    <div className="todo-fs-bold">
+                                                                                                                                        Start:
+                                                                                                                                    </div>
+                                                                                                                                    <div className="mb-1">
+                                                                                                                                        {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                                    </div>
+                                                                                                                                </div>
+
+                                                                                                                                <div className="col-6">
+                                                                                                                                    <div className="todo-fs-bold">
+                                                                                                                                        End:
+                                                                                                                                    </div>
+                                                                                                                                    <div className="mb-1">
+                                                                                                                                        {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                                    </div>   
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </div>
+
+                                                                                                                        <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                            <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
+                                                                                                                                <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                                    <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                                </DropdownToggle>
+
+                                                                                                                                <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                                    {/* {
+                                                                                                                                        this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                            return (
+                                                                                                                                                <div key={ind}>
+                                                                                                                                                    {
+                                                                                                                                                        element.id !== el.id && element.id !== 1 ?
+                                                                                                                                                            <DropdownItem>
+                                                                                                                                                                <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id)}/>
+                                                                                                                                                            </DropdownItem>
+                                                                                                                                                        :
+                                                                                                                                                            null
+                                                                                                                                                    }   
+                                                                                                                                                    
+                                                                                                                                                </div>
+                                                                                                                                            )
+                                                                                                                                        })
+                                                                                                                                    } */}
+
+                                                                                                                                    {/* <DropdownItem>
+                                                                                                                                        <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                    </DropdownItem>
+
+                                                                                                                                    <DropdownItem>
+                                                                                                                                        <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
+                                                                                                                                    </DropdownItem> */}
+
+                                                                                                                                    <DropdownItem>
+                                                                                                                                        <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                                        {/* Modal Detail Task */}
+                                                                                                                                        <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                                    </DropdownItem>
+                                                                                                                                </DropdownMenu>
+                                                                                                                            
+                                                                                                                            </Dropdown>
+                                                                                                                        </div>
                                                                                                                     </div>
 
+                                                                                                                    <div className="todo-fs-bold">
+                                                                                                                        Title: 
+                                                                                                                    </div>
                                                                                                                     <div className="mb-1">
-                                                                                                                        <div className="todo-fs-bold">
-                                                                                                                            Title: 
-                                                                                                                        </div>
-                                                                                                                        <div>
-                                                                                                                            {val.title}
-                                                                                                                        </div>
+                                                                                                                        {val.title}
                                                                                                                     </div>
                                                                                                                     
                                                                                                                     <div className="todo-fs-bold">
                                                                                                                         Description:
                                                                                                                     </div>
-                                                                                                                    <div className="mb-3">
+                                                                                                                    <div className="mb-1">
                                                                                                                         {val.description}
                                                                                                                     </div>
-
-                                                                                                                    {/* <div className="mb-1">
-                                                                                                                        <span className="todo-fs-bold">
-                                                                                                                            Start:
-                                                                                                                        </span>
-                                                                                                                        <span>
-                                                                                                                            {(new Date (val.date_start)).toLocaleString()}
-                                                                                                                        </span>
-                                                                                                                    </div>
-
-                                                                                                                    <div className="mb-1">
-                                                                                                                        <span className="todo-fs-bold">
-                                                                                                                            End:
-                                                                                                                        </span>
-                                                                                                                        <span>
-                                                                                                                            {(new Date (val.date_end)).toLocaleString()}
-                                                                                                                        </span>
-                                                                                                                    </div> */}
-                                                                            
-                                                                                                                    <div className="mb-1">
-                                                                                                                        <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold">
-                                                                                                                            Detail
-                                                                                                                        </button>
-                                                                                                                    </div>
+                                                                                                                                                                                                                        
                                                                                                                 </div>
                                                                                                                 
                                                                                                             :
                                                                                                                 <div className="ml-3 my-3">
-                                                                                                                    You don't have any task in this category.
+                                                                                                                    
                                                                                                                 </div>
                                                                                                         }
                                                                                                     </div>
@@ -1298,7 +1498,7 @@ class Dashboard extends React.Component {
                                                                             </div>
                                                                             
                                                                         :
-                                                                            el.category === "delayed" ?
+                                                                            el.id === 5 ?
                                                                                 <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                                     <div className="d-flex justify-content-between mt-3">
                                                                                         <div className="col-2 p-1 todo-border-dark todo-bg-danger text-light todo-border-rad5 mx-3 todo-fs-bold">
@@ -1311,16 +1511,15 @@ class Dashboard extends React.Component {
                                                                                                     <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                                 </DropdownToggle>
                                                                                                 <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                    {/* <DropdownItem>
-                                                                                                        <input type="button" value="Remove Category ?" className="btn"/>
-                                                                                                    </DropdownItem> */}
+                                                                    
                                                                                                     <DropdownItem>
                                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
                                                                                                     
                                                                                                         {/* Modal Add New Task */}
-                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el.category_at_workspaces_id} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
                                                                                                         
                                                                                                     </DropdownItem>
+                                                                                                    
                                                                                                 </DropdownMenu>
                                                                                             </Dropdown>
                                                                                         </div>
@@ -1330,6 +1529,7 @@ class Dashboard extends React.Component {
                                                                                     <div>
                                                                                         {
                                                                                             this.props.task.taskWorkspaces ?
+                                                                                                
                                                                                                 this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                                     return (
                                                                                                         <div key={index}>
@@ -1337,73 +1537,96 @@ class Dashboard extends React.Component {
                                                                                                                 val.category_tasks_id === 5 ?
                                                                                                                     <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                                         
-                                                                                                                        <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                                            <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                                <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                                    <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                                </DropdownToggle>
+                                                                                                                        <div className="row d-flex justify-content-between">
 
-                                                                                                                                <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Set to On Going" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Set to Cancelled" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                </DropdownMenu>
-                                                                                                                            </Dropdown>
+                                                                                                                            <div className="mb-1 col-9">
+                                                                                                                                
+                                                                                                                                <div className="row">
+                                                                                                                                    <div className="col-6">
+                                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                                            Start:
+                                                                                                                                        </div>
+                                                                                                                                        <div className="mb-1">
+                                                                                                                                            {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+
+                                                                                                                                    <div className="col-6">
+                                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                                            End:
+                                                                                                                                        </div>
+                                                                                                                                        <div className="mb-1">
+                                                                                                                                            {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                                        </div>   
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                            <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
+                                                                                                                                    <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                                        <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                                    </DropdownToggle>
+
+                                                                                                                                    <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                                        {
+                                                                                                                                            this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                                return (
+                                                                                                                                                    <div key={ind}>
+                                                                                                                                                        {
+                                                                                                                                                            element.id !== el.id ?
+                                                                                                                                                                <DropdownItem>
+                                                                                                                                                                    <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id, element.category, element)}/>
+                                                                                                                                                                </DropdownItem>
+                                                                                                                                                            :
+                                                                                                                                                                null
+                                                                                                                                                        }   
+                                                                                                                                                        
+                                                                                                                                                    </div>
+                                                                                                                                                )
+                                                                                                                                            })
+                                                                                                                                        }
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                        </DropdownItem>
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
+                                                                                                                                        </DropdownItem>
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                                            {/* Modal Detail Task */}
+                                                                                                                                            <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                                        </DropdownItem>
+                                                                                                                                    </DropdownMenu>
+                                                                                                                                
+                                                                                                                                </Dropdown>
+                                                                                                                            </div>
                                                                                                                         </div>
 
+                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                            Title: 
+                                                                                                                        </div>
                                                                                                                         <div className="mb-1">
-                                                                                                                            <div className="todo-fs-bold">
-                                                                                                                                Title: 
-                                                                                                                            </div>
-                                                                                                                            <div>
-                                                                                                                                {val.title}
-                                                                                                                            </div>
+                                                                                                                            {val.title}
                                                                                                                         </div>
                                                                                                                         
                                                                                                                         <div className="todo-fs-bold">
                                                                                                                             Description:
                                                                                                                         </div>
-                                                                                                                        <div className="mb-3">
+                                                                                                                        <div className="mb-1">
                                                                                                                             {val.description}
                                                                                                                         </div>
-
-                                                                                                                        {/* <div className="mb-1">
-                                                                                                                            <span className="todo-fs-bold">
-                                                                                                                                Start:
-                                                                                                                            </span>
-                                                                                                                            <span>
-                                                                                                                                {(new Date (val.date_start)).toLocaleString()}
-                                                                                                                            </span>
-                                                                                                                        </div>
-
-                                                                                                                        <div className="mb-1">
-                                                                                                                            <span className="todo-fs-bold">
-                                                                                                                                End:
-                                                                                                                            </span>
-                                                                                                                            <span>
-                                                                                                                                {(new Date (val.date_end)).toLocaleString()}
-                                                                                                                            </span>
-                                                                                                                        </div> */}
-
-                                                                                                                        <div className="mb-1">
-                                                                                                                            <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold">
-                                                                                                                                Detail
-                                                                                                                            </button>
-                                                                                                                        </div>
+                                                                                                                                                                                                                            
                                                                                                                     </div>
                                                                                                                     
                                                                                                                 :
                                                                                                                     <div className="ml-3 my-3">
-                                                                                                                        You don't have any task in this category.
+                                                                                                                        
                                                                                                                     </div>
                                                                                                             }
                                                                                                         </div>
@@ -1418,7 +1641,7 @@ class Dashboard extends React.Component {
                                                                                 </div>
                                                                                 
                                                                             :
-                                                                                el.category !== "todo" || el.category !== "on going" || el.category !== "done" || el.category !== "cancelled" || el.category !== "delayed" ?
+                                                                                el.id !== 1 || el.id !== 2 || el.id !== 3 || el.id !== 4 || el.id !== 5 ?
                                                                                 <div className="todo-border-dark todo-border-rad5 shadow mb-3 p-1">
                                                                                     <div className="d-flex justify-content-between mt-3">
                                                                                         <div className="col-2 p-1 todo-border-dark todo-bg-primary todo-border-rad5 mx-3 todo-fs-bold">
@@ -1431,18 +1654,15 @@ class Dashboard extends React.Component {
                                                                                                     <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
                                                                                                 </DropdownToggle>
                                                                                                 <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                    
+                                                                    
                                                                                                     <DropdownItem>
                                                                                                         <input type="button" value="Add New Task ?" className="btn" onClick={() => this.onShowAddTask(i)}/>
                                                                                                     
                                                                                                         {/* Modal Add New Task */}
-                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
+                                                                                                        <CreateTask idCategory={el.id} idWorkspace={this.state.activeWorkspace} indexCategory={i} category_tasks_category_at_workspaces_id={el.category_at_workspaces_id} stateModal={this.state.modalAddTasks[i]} toggleModalAdd={this.onToggleAddTask }></CreateTask>
                                                                                                         
                                                                                                     </DropdownItem>
-
-                                                                                                    <DropdownItem>
-                                                                                                        <input type="button" value="Remove Category ?" className="btn" onClick={() => this.onRemoveCategory(el.id, el.category_at_workspaces_id)}/>
-                                                                                                    </DropdownItem>
+                                                                                                    
                                                                                                 </DropdownMenu>
                                                                                             </Dropdown>
                                                                                         </div>
@@ -1452,6 +1672,7 @@ class Dashboard extends React.Component {
                                                                                     <div>
                                                                                         {
                                                                                             this.props.task.taskWorkspaces ?
+                                                                                                
                                                                                                 this.props.task.taskWorkspaces.map ((val, index) => {
                                                                                                     return (
                                                                                                         <div key={index}>
@@ -1459,73 +1680,96 @@ class Dashboard extends React.Component {
                                                                                                                 val.category_tasks_id === el.id ?
                                                                                                                     <div className="col-10 my-3 ml-3 p-1 todo-border-dark todo-border-rad5 shadow">
                                                                                                                         
-                                                                                                                        <div className="mb-1 d-flex flex-row-reverse">
-                                                                                                                            <Dropdown isOpen={this.state.dropDownTasks[i]} toggle={() => this.toggleDropdownTask(i)}>
-                                                                                                                                <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
-                                                                                                                                    <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
-                                                                                                                                </DropdownToggle>
+                                                                                                                        <div className="row d-flex justify-content-between">
 
-                                                                                                                                <DropdownMenu className="todo-border-dark todo-border-rad5">
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Set to On Going" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Set to Cancelled" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Edit This Task" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                    <DropdownItem>
-                                                                                                                                        <input type="button" value="Remove This Task" className="btn"/>
-                                                                                                                                    </DropdownItem>
-                                                                                                                                </DropdownMenu>
-                                                                                                                            </Dropdown>
+                                                                                                                            <div className="mb-1 col-9">
+                                                                                                                                
+                                                                                                                                <div className="row">
+                                                                                                                                    <div className="col-6">
+                                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                                            Start:
+                                                                                                                                        </div>
+                                                                                                                                        <div className="mb-1">
+                                                                                                                                            {(new Date (val.date_start)).toLocaleString()}
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+
+                                                                                                                                    <div className="col-6">
+                                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                                            End:
+                                                                                                                                        </div>
+                                                                                                                                        <div className="mb-1">
+                                                                                                                                            {(new Date (val.date_end)).toLocaleString()}
+                                                                                                                                        </div>   
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                            <div className="mb-1 col-2 d-flex flex-row-reverse">
+                                                                                                                                <Dropdown isOpen={this.state.dropDownTasks[index]} toggle={() => this.toggleDropdownTask(index)}>
+                                                                                                                                    <DropdownToggle className="btn btn-light todo-border-dark todo-border-rad5">
+                                                                                                                                        <FontAwesomeIcon icon={faBars} ></FontAwesomeIcon>
+                                                                                                                                    </DropdownToggle>
+
+                                                                                                                                    <DropdownMenu className="todo-border-dark todo-border-rad5">
+
+                                                                                                                                        {
+                                                                                                                                            this.props.task.dataCategories.map ((element, ind) => {
+                                                                                                                                                return (
+                                                                                                                                                    <div key={ind}>
+                                                                                                                                                        {
+                                                                                                                                                            element.id !== el.id ?
+                                                                                                                                                                <DropdownItem>
+                                                                                                                                                                    <input type="button" value={`Set To ${element.category}`} className="btn" onClick={() => this.onSetToCategory(val, element.id, element.category, element)}/>
+                                                                                                                                                                </DropdownItem>
+                                                                                                                                                            :
+                                                                                                                                                                null
+                                                                                                                                                        }   
+                                                                                                                                                        
+                                                                                                                                                    </div>
+                                                                                                                                                )
+                                                                                                                                            })
+                                                                                                                                        }
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                        </DropdownItem>
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
+                                                                                                                                        </DropdownItem>
+
+                                                                                                                                        <DropdownItem>
+                                                                                                                                            <input type="button" value="Detail Task" className="btn" onClick={() => this.onShowDetailTask(index)}/>
+
+                                                                                                                                            {/* Modal Detail Task */}
+                                                                                                                                            <DetailTask idTask={val.id} indexTask={index} stateModal={this.state.modalDetailTasks[index]} toggleModalDetail = {this.onToggleDetailTask}></DetailTask>
+                                                                                                                                        </DropdownItem>
+                                                                                                                                    </DropdownMenu>
+                                                                                                                                
+                                                                                                                                </Dropdown>
+                                                                                                                            </div>
                                                                                                                         </div>
 
+                                                                                                                        <div className="todo-fs-bold">
+                                                                                                                            Title: 
+                                                                                                                        </div>
                                                                                                                         <div className="mb-1">
-                                                                                                                            <div className="todo-fs-bold">
-                                                                                                                                Title: 
-                                                                                                                            </div>
-                                                                                                                            <div>
-                                                                                                                                {val.title}
-                                                                                                                            </div>
+                                                                                                                            {val.title}
                                                                                                                         </div>
                                                                                                                         
                                                                                                                         <div className="todo-fs-bold">
                                                                                                                             Description:
                                                                                                                         </div>
-                                                                                                                        <div className="mb-3">
+                                                                                                                        <div className="mb-1">
                                                                                                                             {val.description}
                                                                                                                         </div>
-
-                                                                                                                        {/* <div className="mb-1">
-                                                                                                                            <span className="todo-fs-bold">
-                                                                                                                                Start:
-                                                                                                                            </span>
-                                                                                                                            <span>
-                                                                                                                                {(new Date (val.date_start)).toLocaleString()}
-                                                                                                                            </span>
-                                                                                                                        </div>
-
-                                                                                                                        <div className="mb-1">
-                                                                                                                            <span className="todo-fs-bold">
-                                                                                                                                End:
-                                                                                                                            </span>
-                                                                                                                            <span>
-                                                                                                                                {(new Date (val.date_end)).toLocaleString()}
-                                                                                                                            </span>
-                                                                                                                        </div> */}
-                                                                                                                        
-                                                                                                                        <div className="mb-1">
-                                                                                                                            <button className=" col-12 btn todo-btn-primary todo-border-dark todo-border-rad5 todo-fs-bold">
-                                                                                                                                Detail
-                                                                                                                            </button>
-                                                                                                                        </div>
+                                                                                                                                                                                                                            
                                                                                                                     </div>
                                                                                                                     
                                                                                                                 :
                                                                                                                     <div className="ml-3 my-3">
-                                                                                                                        You don't have any task in this category.
+                                                                                                                        
                                                                                                                     </div>
                                                                                                             }
                                                                                                         </div>
@@ -1536,6 +1780,7 @@ class Dashboard extends React.Component {
                                                                                                     You don't have any task yet.
                                                                                                 </div>
                                                                                         }
+                                                                                        
                                                                                     </div>
                                                                                 </div>
                                                                                     
@@ -1588,7 +1833,10 @@ const mapDispatchToProps = {
     removeWorkspace,
     onGetCategoryByWorkspace,
     onGetTaskByWorkspace,
-    deleteCategory
+    getDataTask,
+    editTask,
+    deleteCategory,
+    deleteTask
 }
 
 export default connect (mapStateToProps, mapDispatchToProps) (Dashboard)

@@ -239,6 +239,51 @@ export const getAssigneeTask = (idTask) => {
     
 }
 
+export const editTask = (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token) => {
+    return (dispatch) => {
+        // console.log (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, token)
+
+        Axios.patch (`${linkAPITask}/edit-task`, {idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token})
+
+        .then ((res) => {
+            // console.log (res.data)
+
+            if (res.data.error === false) {
+                Axios.post (`${linkAPITask}/get-task-by-workspace`, {idWorkspace, token})
+
+                .then ((res) => {
+                    // console.log (res.data.data)
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_TASK_WORKSPACE_SUCCESS",
+                            payload: res.data.data
+                        })
+
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_TASK_WORKSPACE_ERROR",
+                            payload:res.data.message
+                        })
+                    }
+                })
+            } else {
+                dispatch ({
+                    type: "EDIT_TASK_ERROR",
+                    payload:res.data.message
+                }) 
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "EDIT_TASK_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}
+
 export const deleteCategory = (idCategory,idWorkspace, token) => {
     return (dispatch) => {
         Axios.post (`${linkAPITask}/delete-category`, {idCategory, token})
@@ -284,6 +329,57 @@ export const deleteCategory = (idCategory,idWorkspace, token) => {
             console.log (err)
             dispatch ({
                 type: "DELETE_CATEGORY_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}
+
+export const deleteTask = (idWorkspace, idTask, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/${idTask}/delete-task`, {token})
+
+        .then ((res) => {
+            if (res.data.error === false) {
+                Axios.post (`${linkAPITask}/get-task-by-workspace`, {idWorkspace, token})
+
+                .then ((res) => {
+                    // console.log (res.data.data)
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_TASK_WORKSPACE_SUCCESS",
+                            payload: res.data.data
+                        })
+
+                    } else if (res.data.error === true) {
+                        dispatch ({
+                            type: "GET_TASK_WORKSPACE_ERROR",
+                            payload:res.data.message
+                        })
+                    }
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_TASK_WORKSPACE_ERROR",
+                        payload:err.message
+                    })
+                })
+
+
+            } else {
+                dispatch ({
+                    type: "DELETE_TASK_ERROR",
+                    payload:res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "DELETE_TASK_ERROR",
                 payload:err.message
             })
         })
