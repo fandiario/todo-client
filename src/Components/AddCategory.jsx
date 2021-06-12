@@ -90,7 +90,7 @@ class CreateCategory extends React.Component {
                                 null
                         }
 
-                        {
+                        {/* {
                             this.props.task.message && this.props.task.error === true  ?
                                 <div className="row mx-3 my-3">
                                     <div className="col-12 d-flex justify-content-center">
@@ -114,7 +114,7 @@ class CreateCategory extends React.Component {
                                 </div>
                             :
                                 null
-                        }
+                        } */}
                         
                         {/* Form */}
                         <form className="col-12">

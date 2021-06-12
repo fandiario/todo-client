@@ -177,6 +177,56 @@ export const createTask = (title, description, date_start, date_end, token, cate
     }
 }
 
+export const addAssigneeTask = (idTask, assignee_users_id, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/${idTask}/assign-task`, {assignee_users_id, token})
+
+        .then ((res) => {
+            
+            if (res.data.error === true) {
+                Axios.post (`${linkAPITask}/get-assignee-from-task`, {idTask})
+
+                .then ((res) => {
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_DATA_ASSIGNEE_SUCCESS",
+                            payload: res.data.data
+                        })
+
+                    } else {
+                        dispatch ({
+                            type: "GET_DATA_ASSIGNEE_ERROR",
+                            payload:res.data.message
+                        })
+                    }
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_DATA_ASSIGNEE_ERROR",
+                        payload:err.message
+                    })
+                })
+
+            } else {
+                dispatch ({
+                    type: "ADD_ASSIGNEE_ERROR",
+                    payload: res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "ADD_ASSIGNEE_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}
+
 export const getDataTask = (idTask) => {
     return (dispatch) => {
         Axios.post (`${linkAPITask}/get-data-task`, {idTask})
@@ -380,6 +430,57 @@ export const deleteTask = (idWorkspace, idTask, token) => {
             console.log (err)
             dispatch ({
                 type: "DELETE_TASK_ERROR",
+                payload:err.message
+            })
+        })
+    }
+}
+
+export const deleteAssigneeTask = (idUser, idTask, token) => {
+    return (dispatch) => {
+        Axios.post (`${linkAPITask}/${idTask}/delete-assignee`, {idUser, token})
+
+        .then ((res) => {
+            // console.log (res)
+
+            if (res.data.error === false) {
+                Axios.post (`${linkAPITask}/get-assignee-from-task`, {idTask})
+
+                .then ((res) => {
+                    if (res.data.error === false) {
+                        dispatch ({
+                            type: "GET_DATA_ASSIGNEE_SUCCESS",
+                            payload: res.data.data
+                        })
+
+                    } else {
+                        dispatch ({
+                            type: "GET_DATA_ASSIGNEE_ERROR",
+                            payload:res.data.message
+                        })
+                    }
+                })
+
+                .catch ((err) => {
+                    console.log (err)
+                    dispatch ({
+                        type: "GET_DATA_ASSIGNEE_ERROR",
+                        payload:err.message
+                    })
+                })
+
+            } else {
+                dispatch ({
+                    type: "DELETE_ASSIGNEE_ERROR",
+                    payload:res.data.message
+                })
+            }
+        })
+
+        .catch ((err) => {
+            console.log (err)
+            dispatch ({
+                type: "DELETE_ASSIGNEE_ERROR",
                 payload:err.message
             })
         })

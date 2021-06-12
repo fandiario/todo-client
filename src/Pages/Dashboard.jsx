@@ -16,8 +16,8 @@ import DetailAssignedWorkspace from "../Components/DetailAssignedWorkspace"
 import EditWorkspace from "../Components/EditWorkspace"
 
 import CreateCategory from "../Components/AddCategory"
-
 import CreateTask from "../Components/AddTask"
+import EditTask from "../Components/EditTask"
 import DetailTask from "../Components/DetailTask"
 
 // Reactstrap
@@ -46,6 +46,7 @@ class Dashboard extends React.Component {
         modalDetailWorkspaces: [],
         modalDetailAssignedWorkspaces: [],
         modalAddTasks: [],
+        modalEditTasks: [],
         modalDetailTasks: []
     }
 
@@ -289,6 +290,7 @@ class Dashboard extends React.Component {
         let token = localStorage.getItem ("token")
         let arrTasks = []
         let arrDropDowns = []
+        let arrEditTasks = []
         let arrDetailTasks = []
 
         this.props.onGetTaskByWorkspace (idWorkspace, token)
@@ -302,6 +304,7 @@ class Dashboard extends React.Component {
 
             for (let i = 0; i < arrTasks.length; i++) {
                 arrDropDowns.push (false)
+                arrEditTasks.push (false)
                 arrDetailTasks.push (false)
             }
             
@@ -314,6 +317,7 @@ class Dashboard extends React.Component {
 
         this.setState ({taskWorkspaces: arrTasks})
         this.setState ({dropDownTasks: arrDropDowns})
+        this.setState ({modalEditTasks: arrEditTasks})
         this.setState ({modalDetailTasks: arrDetailTasks})
 
        
@@ -352,49 +356,55 @@ class Dashboard extends React.Component {
         // console.log (dataTask)
         // console.log (dataCategory)
 
-        swal ({
-            title: `Set to ${titleCategory} ?`,
-            text: `Are you sure you want to set this task to ${titleCategory} category ?`,
-            icon: "warning",
-            buttons: true,
-            dangerMode: true
-        })
-
-        .then ((res) => {
-            if (res) {
-                this.props.editTask (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token)
-
-                // window.location = "/dashboard"
-            } else {
-                swal({
-                    title: "Cancelled!",
-                    text: "Data Update has been cancelled",
-                    icon: "info",
-                })
-            }
-        })
-    }
-
-    onEditTask = (idTask) => {
-        if (this.state.activeWorkspace.created_by_users_id === this.props.user.dataUser.id){
-
-            // let arrModalAddTasks = this.state.modalAddTasks
-
-            // arrModalAddTasks[index] = true
-
-            // this.setState ({modalAddTasks: arrModalAddTasks})
-
-            console.log (idTask)
-
-        } else {
+        if (idCategory === 3 || idCategory === 4) {
             swal ({
-                title: "Forbidden !",
-                text: "Unauthorized account. You can't edit task from assigned workspace.",
-                icon: "error",
+                title: `Set to ${titleCategory} ?`,
+                text: `Are you sure you want to set this task to ${titleCategory} category ? You can't edit, delete or set to another category if you set it to ${titleCategory}.`,
+                icon: "warning",
                 buttons: true,
                 dangerMode: true
             })
+    
+            .then ((res) => {
+                if (res) {
+                    this.props.editTask (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token)
+    
+                    // window.location = "/dashboard"
+                } else {
+                    swal({
+                        title: "Cancelled!",
+                        text: "Data Update has been cancelled",
+                        icon: "info",
+                    })
+                }
+            })
+
+        } else {
+            swal ({
+                title: `Set to ${titleCategory} ?`,
+                text: `Are you sure you want to set this task to ${titleCategory} category ?`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            })
+    
+            .then ((res) => {
+                if (res) {
+                    this.props.editTask (idTask, title, description, date_start, date_end, category_tasks_id, idWorkspace, category_tasks_category_at_workspaces_id, category_at_workspaces_id, token)
+    
+                    // window.location = "/dashboard"
+                } else {
+                    swal({
+                        title: "Cancelled!",
+                        text: "Data Update has been cancelled",
+                        icon: "info",
+                    })
+                }
+            })
+
         }
+
+        
     }
 
     onRemoveTask = (idWorkspace, idTask) => {
@@ -636,6 +646,40 @@ class Dashboard extends React.Component {
     }
 
         // Task
+    onShowEditTask = (index) => {
+        if (this.state.modalEditTasks) {
+            if (this.state.activeWorkspace.created_by_users_id === this.props.user.dataUser.id){
+
+                let arrModalEditTasks = this.state.modalEditTasks
+
+                arrModalEditTasks[index] = true
+
+                this.setState ({modalEditTasks: arrModalEditTasks})
+
+                // console.log ("dashboard")
+                // console.log (this.state.modalEditTasks)
+
+            } else {
+                swal ({
+                    title: "Forbidden !",
+                    text: "Unauthorized account. You can't edit task from assigned workspace.",
+                    icon: "error",
+                    buttons: true,
+                    dangerMode: true
+                })
+            }
+            
+        }
+    }
+
+    onToggleEditTask = (data) => {
+        let modalEditTasks = this.state.modalEditTasks
+
+        modalEditTasks[data.index] = data.state
+
+        this.setState ({modalEditTasks: modalEditTasks})
+    }
+
     onShowDetailTask = (index) => {
         // console.log (index)
         
@@ -1022,7 +1066,10 @@ class Dashboard extends React.Component {
                                                                                                                         }
 
                                                                                                                         <DropdownItem>
-                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onShowEditTask(index)}/>
+
+                                                                                                                            {/* Modal Edit Task */}
+                                                                                                                            <EditTask idTask={val.id} dataTask={val} dataCategory={el} idWorkspace={this.state.activeWorkspace.id} indexTask={index} stateModal={this.state.modalEditTasks[index]} toggleEditTask={this.onToggleEditTask}></EditTask>
                                                                                                                         </DropdownItem>
 
                                                                                                                         <DropdownItem>
@@ -1165,9 +1212,12 @@ class Dashboard extends React.Component {
                                                                                                                                 })
                                                                                                                             }
 
-                                                                                                                            <DropdownItem>
-                                                                                                                                <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
-                                                                                                                            </DropdownItem>
+                                                                                                                        <DropdownItem>
+                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onShowEditTask(index)}/>
+
+                                                                                                                            {/* Modal Edit Task */}
+                                                                                                                            <EditTask idTask={val.id} dataTask={val} dataCategory={el} idWorkspace={this.state.activeWorkspace.id} indexTask={index} stateModal={this.state.modalEditTasks[index]} toggleEditTask={this.onToggleEditTask}></EditTask>
+                                                                                                                        </DropdownItem>
 
                                                                                                                             <DropdownItem>
                                                                                                                                 <input type="button" value="Remove This Task" className="btn" onClick={() => this.onRemoveTask(this.state.activeWorkspace.id, val.id)}/>
@@ -1589,7 +1639,10 @@ class Dashboard extends React.Component {
                                                                                                                                         }
 
                                                                                                                                         <DropdownItem>
-                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onShowEditTask(index)}/>
+
+                                                                                                                                            {/* Modal Edit Task */}
+                                                                                                                            <EditTask idTask={val.id} dataTask={val} dataCategory={el} idWorkspace={this.state.activeWorkspace.id} indexTask={index} stateModal={this.state.modalEditTasks[index]} toggleEditTask={this.onToggleEditTask}></EditTask>
                                                                                                                                         </DropdownItem>
 
                                                                                                                                         <DropdownItem>
@@ -1732,7 +1785,10 @@ class Dashboard extends React.Component {
                                                                                                                                         }
 
                                                                                                                                         <DropdownItem>
-                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onEditTask(val.id)}/>
+                                                                                                                                            <input type="button" value="Edit This Task" className="btn" onClick={() => this.onShowEditTask(index)}/>
+
+                                                                                                                                            {/* Modal Edit Task */}
+                                                                                                                            <EditTask idTask={val.id} dataTask={val} dataCategory={el} idWorkspace={this.state.activeWorkspace.id} indexTask={index} stateModal={this.state.modalEditTasks[index]} toggleEditTask={this.onToggleEditTask}></EditTask>
                                                                                                                                         </DropdownItem>
 
                                                                                                                                         <DropdownItem>
