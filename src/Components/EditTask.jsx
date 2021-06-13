@@ -84,7 +84,20 @@ class EditTask extends React.Component {
         let assignee_users_id = this.assigneeInput.value
         let token = localStorage.getItem ("token")
 
-        this.props.addAssigneeTask(idTask, assignee_users_id, token)
+        let arrAlerts = []
+
+        if (!assignee_users_id){
+            arrAlerts.push ("Empty data field detected.")
+            this.setState ({alerts: arrAlerts})
+
+        } else {
+            this.props.addAssigneeTask(idTask, assignee_users_id, token)
+
+            this.setState ({alerts: []})
+            this.setState ({showButton: false})
+        }
+
+        
 
         // console.log (assignee_users_id)
     }
