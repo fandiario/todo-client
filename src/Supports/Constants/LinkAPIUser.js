@@ -1,3 +1,3 @@
-const linkAPIUser = "http://localhost:5000/user"
+const linkAPIUser = "https://getitdone-server.herokuapp.com/user"
 
 export default linkAPIUser

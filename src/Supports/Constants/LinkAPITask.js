@@ -1,3 +1,3 @@
-const linkAPITask = "http://localhost:5000/task"
+const linkAPITask = "https://getitdone-server.herokuapp.com/task"
 
 export default linkAPITask

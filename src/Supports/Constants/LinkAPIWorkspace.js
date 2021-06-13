@@ -1,3 +1,3 @@
-const linkAPIWorkspace = "http://localhost:5000/workspace"
+const linkAPIWorkspace = "https://getitdone-server.herokuapp.com/workspace"
 
 export default linkAPIWorkspace
